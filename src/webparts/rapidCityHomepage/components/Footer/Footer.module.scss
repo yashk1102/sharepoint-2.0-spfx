@@ -1,0 +1,45 @@
+@import '../../theme/themeVariables.module.scss';
+
+.footer {
+  margin-top: auto;
+  padding: calc(var(--rct-spacing-unit) * 3) calc(var(--rct-spacing-unit) * 3);
+  background: var(--rct-surface-midnight);      /* Dark Navy #262931 */
+  border-top: 3px solid var(--rct-brand-gold);  /* Gold accent strip */
+  text-align: center;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.80);            /* Light text on dark navy */
+  flex-wrap: wrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--rct-spacing-unit);
+}
+
+.copyright {
+  color: var(--rct-text-inverse);               /* White on dark navy: 14.54:1 → AAA */
+}
+
+.sep {
+  color: rgba(255, 255, 255, 0.30);
+}
+
+.feedback {
+  color: var(--rct-brand-gold);                 /* Gold on dark navy: 6.05:1 → AA */
+  text-decoration: underline;
+  outline: none;
+  font-weight: 600;
+  transition: color var(--rct-transition);
+
+  &:hover {
+    color: var(--rct-gold-light);               /* Light Gold hover */
+  }
+
+  &:focus-visible {
+    outline: var(--rct-focus-outline);
+    outline-offset: 2px;
+  }
+}
+
+.updated {
+  color: rgba(255, 255, 255, 0.65);
+}

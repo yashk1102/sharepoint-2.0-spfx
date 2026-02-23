@@ -1,0 +1,26 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx/client-side-web-part-manifest.schema.json",
+  "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "alias": "CustomerContactCardsWebPart",
+  "componentType": "WebPart",
+  "version": "1.0.0",
+  "manifestVersion": 2,
+  "requiresCustomScript": false,
+  "supportedHosts": [
+    "SharePointWebPart",
+    "SharePointFullPage"
+  ],
+  "supportsThemeVariants": true,
+  "preconfiguredEntries": [
+    {
+      "groupId": "5c03119e-3074-46fd-976b-c60198311f70",
+      "group": { "default": "Advanced" },
+      "title": { "default": "Customer Contact Cards" },
+      "description": {
+        "default": "Browse and view Customer Contact Cards with booking, service amendment, and contact instructions."
+      },
+      "officeFabricIconFontName": "ContactCard",
+      "properties": {}
+    }
+  ]
+}

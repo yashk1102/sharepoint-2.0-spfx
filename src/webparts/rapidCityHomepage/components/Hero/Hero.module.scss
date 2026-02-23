@@ -1,0 +1,66 @@
+@import '../../theme/themeVariables.module.scss';
+
+.hero {
+  position: relative;
+  text-align: center;
+  padding: calc(var(--rct-spacing-unit) * 8) calc(var(--rct-spacing-unit) * 3);
+  max-width: none;
+  margin: 0 auto;
+  background: linear-gradient(
+    135deg,
+    var(--rct-surface-dark) 0%,               /* Primary Blue #1F4C7F */
+    var(--rct-surface-midnight) 100%           /* Dark Navy #262931    */
+  );
+  overflow: hidden;
+}
+
+/* Gold accent bar removed — was clashing with nav active-link underline */
+
+/* Subtle blue radial glow behind text (decorative) */
+.hero::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 600px;
+  height: 400px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(ellipse, rgba(98, 169, 184, 0.15) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.title {
+  position: relative;
+  z-index: 1;
+  margin: 0 0 var(--rct-spacing-unit);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--rct-text-inverse);             /* White on blue: 8.71:1 → AAA */
+  letter-spacing: -0.3px;
+}
+
+.subtitle {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  font-size: 16px;
+  color: var(--rct-gold-light);               /* Light Gold on dark bg: 4.62:1 → AA */
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+@media (min-width: 640px) {
+  .hero {
+    padding: calc(var(--rct-spacing-unit) * 10) calc(var(--rct-spacing-unit) * 4);
+  }
+
+  .title {
+    font-size: 36px;
+  }
+
+  .subtitle {
+    font-size: 18px;
+  }
+}

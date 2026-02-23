@@ -1,0 +1,26 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/config.2.0.schema.json",
+  "version": "2.0",
+  "bundles": {
+    "rapid-city-homepage-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/rapidCityHomepage/RapidCityHomepageWebPart.js",
+          "manifest": "./src/webparts/rapidCityHomepage/RapidCityHomepageWebPart.manifest.json"
+        }
+      ]
+    },
+    "customer-contact-cards-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/customerContactCards/CustomerContactCardsWebPart.js",
+          "manifest": "./src/webparts/customerContactCards/CustomerContactCardsWebPart.manifest.json"
+        }
+      ]
+    }
+  },
+  "externals": {},
+  "localizedResources": {
+    "RapidCityHomepageWebPartStrings": "lib/webparts/rapidCityHomepage/loc/{locale}.js"
+  }
+}

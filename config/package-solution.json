@@ -1,0 +1,40 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "rapid-city-transportation-hub-client-side-solution",
+    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "developer": {
+      "name": "Rapid City Transportation",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.18.2"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "Rapid City Transportation Hub landing page"
+      },
+      "longDescription": {
+        "default": "Intranet homepage for Rapid City Transportation Hub with header, search, navigation, hero, daily highlight, and quick links."
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "Rapid City Homepage Feature",
+        "description": "Landing page web part for Rapid City Transportation Hub intranet.",
+        "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+        "version": "1.0.0.0"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/rapid-city-transportation-hub.sppkg"
+  }
+}

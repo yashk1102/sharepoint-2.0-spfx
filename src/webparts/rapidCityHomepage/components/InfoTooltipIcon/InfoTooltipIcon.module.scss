@@ -1,0 +1,26 @@
+@import '../../theme/themeVariables.module.scss';
+
+.iconWrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: help;
+  padding: 2px;
+  border-radius: 50%;
+  outline: none;
+
+  &:focus-visible {
+    outline: var(--rct-focus-outline);
+    outline-offset: 2px;
+  }
+
+  &:hover .icon {
+    color: var(--rct-primary);
+  }
+}
+
+.icon {
+  font-size: 16px;
+  color: var(--rct-text-secondary);
+  transition: color 0.15s ease;
+}

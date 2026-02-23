@@ -1,0 +1,41 @@
+@import '../theme/themeVariables.module.scss';
+
+:global {
+  #workbenchPageContent,
+  .CanvasComponent.LCS .CanvasZone {
+    max-width: 100% !important;
+  }
+}
+
+.container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--rct-background);
+  color: var(--rct-text-primary);
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.skipLink {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 9999;
+  padding: var(--rct-spacing-unit) calc(var(--rct-spacing-unit) * 2);
+  background: var(--rct-primary);               /* Primary Blue */
+  color: var(--rct-text-inverse);               /* White */
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 0 0 var(--rct-border-radius) 0;
+
+  &:focus {
+    left: 0;
+    outline: var(--rct-focus-outline);
+    outline-offset: 2px;
+  }
+}
+
+.main {
+  flex: 1;
+  padding-bottom: calc(var(--rct-spacing-unit) * 4);
+}

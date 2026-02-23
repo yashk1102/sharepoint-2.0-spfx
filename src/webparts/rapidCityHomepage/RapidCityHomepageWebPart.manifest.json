@@ -1,0 +1,36 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx/client-side-web-part-manifest.schema.json",
+  "id": "c4d5e6f7-a8b9-0123-cdef-123456789012",
+  "alias": "RapidCityHomepageWebPart",
+  "componentType": "WebPart",
+  "version": "1.0.0",
+  "manifestVersion": 2,
+  "requiresCustomScript": false,
+  "supportedHosts": [
+    "SharePointWebPart",
+    "TeamsPersonalApp",
+    "TeamsTab",
+    "SharePointFullPage"
+  ],
+  "supportsThemeVariants": true,
+  "preconfiguredEntries": [
+    {
+      "groupId": "5c03119e-3074-46fd-976b-c60198311f70",
+      "group": {
+        "default": "Advanced"
+      },
+      "title": {
+        "default": "Rapid City Homepage"
+      },
+      "description": {
+        "default": "Rapid City Transportation Hub intranet landing page"
+      },
+      "officeFabricIconFontName": "Page",
+      "properties": {
+        "quickLinksJson": "",
+        "contactCardsPageUrl": "/sites/intranet/SitePages/ContactCards.aspx",
+        "feedbackUrl": "#"
+      }
+    }
+  ]
+}
