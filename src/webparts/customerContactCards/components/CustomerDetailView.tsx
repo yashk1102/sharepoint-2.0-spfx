@@ -201,24 +201,15 @@ const ReminderCallsContent: React.FC<{ tabContent: ITabContent }> = ({ tabConten
   const { reminderCalls } = tabContent;
   return (
     <div>
-      <div className={styles.instructionGroup}>
-        <div className={styles.instructionGroupTitle}>Call Timing</div>
-        <ul className={styles.instructionList}>
-          {reminderCalls.callTiming.map((t, i) => <li key={i}>{t}</li>)}
-        </ul>
-      </div>
-      <div className={styles.instructionGroup}>
-        <div className={styles.instructionGroupTitle}>Call Attempts</div>
-        <ul className={styles.instructionList}>
-          {reminderCalls.callAttempts.map((a, i) => <li key={i}>{a}</li>)}
-        </ul>
-      </div>
-      <div className={styles.instructionGroup}>
-        <div className={styles.instructionGroupTitle}>Clinic Escalation</div>
-        <ul className={styles.instructionList}>
-          {reminderCalls.clinicEscalation.map((e, i) => <li key={i}>{e}</li>)}
-        </ul>
-      </div>
+      <InstructionGroupList groups={reminderCalls.instructionGroups} />
+      {reminderCalls.problemWithReminderCall && (
+        <div className={styles.instructionGroup}>
+          <div className={styles.instructionGroupTitle}>Problem With Reminder Call</div>
+          <ul className={styles.instructionList}>
+            <li>{reminderCalls.problemWithReminderCall}</li>
+          </ul>
+        </div>
+      )}
     </div>
   );
 };

@@ -69,9 +69,8 @@ export interface ITabContent {
   serviceAmendments: Partial<Record<ServiceAmendmentOption, IInstructionGroup[]>>;
   cancellationsAndChanges: IInstructionGroup[];
   reminderCalls: {
-    callTiming: string[];
-    callAttempts: string[];
-    clinicEscalation: string[];
+    instructionGroups: IInstructionGroup[];
+    problemWithReminderCall?: string;
   };
   contactInformation: {
     businessHours: string;
@@ -210,20 +209,26 @@ function makeTabContent(
       },
     ],
     reminderCalls: {
-      callTiming: [
-        'First reminder call placed 24 hours before the scheduled pickup.',
-        'Second reminder placed 2 hours before pickup.',
-        'Calls are placed to the primary contact number on file.',
-      ],
-      callAttempts: [
-        'Up to 3 call attempts will be made per reminder window.',
-        'If no answer, a voicemail will be left with trip details.',
-        'After 3 unanswered attempts, dispatch will flag the trip for supervisor follow-up.',
-      ],
-      clinicEscalation: [
-        `If the passenger cannot be reached, contact ${orgName} scheduling at ${phone}.`,
-        `Escalation email will be sent to ${email} when a trip is at risk of being missed.`,
-        'Dispatch supervisor is notified for same-day at-risk trips.',
+      instructionGroups: [
+        {
+          title: 'Confirmation Call',
+          items: [
+            'First reminder call placed 24 hours before the scheduled pickup.',
+            'Second reminder placed 2 hours before pickup.',
+            'Calls are placed to the primary contact number on file.',
+            'Up to 3 call attempts will be made per reminder window.',
+            'If no answer, a voicemail will be left with trip details.',
+            'After 3 unanswered attempts, dispatch will flag the trip for supervisor follow-up.',
+          ],
+        },
+        {
+          title: 'Escalation',
+          items: [
+            `If the passenger cannot be reached, contact ${orgName} scheduling at ${phone}.`,
+            `Escalation email will be sent to ${email} when a trip is at risk of being missed.`,
+            'Dispatch supervisor is notified for same-day at-risk trips.',
+          ],
+        },
       ],
     },
     contactInformation: {
@@ -449,9 +454,16 @@ export const MOCK_CUSTOMERS: ICustomer[] = [
         },
       ],
       reminderCalls: {
-        callTiming:       ['72 hours before the scheduled appointment'],
-        callAttempts:     ['2 attempts maximum per reminder window'],
-        clinicEscalation: ['Send scheduled email to transportation@assessmed.com'],
+        instructionGroups: [
+          {
+            title: 'Confirmation Call',
+            items: [
+              '72 hours before the scheduled appointment',
+              '2 attempts maximum per reminder window',
+            ],
+          },
+        ],
+        problemWithReminderCall: 'Send scheduled email to transportation@assessmed.com',
       },
       contactInformation: {
         businessHours: 'Monday – Friday | 7:30 AM – 5:00 PM EST',

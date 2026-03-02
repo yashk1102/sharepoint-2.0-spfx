@@ -2,7 +2,6 @@ import * as React from 'react';
 import { Navigation } from './Navigation/Navigation';
 import { Hero } from './Hero/Hero';
 import { DailyHighlight } from './DailyHighlight/DailyHighlight';
-import { QuickLinks } from './QuickLinks/QuickLinks';
 import { Footer } from './Footer/Footer';
 import { defaultTheme, getThemeCssVariables } from '../theme/ThemeTokens';
 import { IRapidCityHomepageProps } from './IRapidCityHomepageProps';
@@ -60,7 +59,6 @@ export default function RapidCityHomepage(props: IRapidCityHomepageProps) {
       <main id="main-content" className={styles.main} role="main" tabIndex={-1}>
         <Hero />
         <DailyHighlight />
-        <QuickLinks links={props.quickLinks} />
       </main>
 
       <Footer feedbackUrl={props.feedbackUrl} />

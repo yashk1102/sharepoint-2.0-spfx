@@ -219,6 +219,11 @@ $transition:      0.18s ease;
   grid-template-columns: repeat(4, 1fr);
   gap: 20px;
 
+  // Ensure wrapper divs stretch so cards within each row share the same height
+  > * {
+    display: flex;
+  }
+
   @media (max-width: 1100px) {
     grid-template-columns: repeat(3, 1fr);
   }

@@ -1,18 +1,18 @@
 /* tslint:disable */
 require("./Navigation.module.css");
 const styles = {
-  nav: 'nav_ba71b879',
-  navInner: 'navInner_ba71b879',
-  list: 'list_ba71b879',
-  listItem: 'listItem_ba71b879',
-  link: 'link_ba71b879',
-  linkActive: 'linkActive_ba71b879',
-  dropdown: 'dropdown_ba71b879',
-  dropdownTitle: 'dropdownTitle_ba71b879',
-  chevron: 'chevron_ba71b879',
-  utilityBar: 'utilityBar_ba71b879',
-  searchBox: 'searchBox_ba71b879',
-  utilityIcon: 'utilityIcon_ba71b879'
+  nav: 'nav_9fe36029',
+  navInner: 'navInner_9fe36029',
+  list: 'list_9fe36029',
+  listItem: 'listItem_9fe36029',
+  link: 'link_9fe36029',
+  linkActive: 'linkActive_9fe36029',
+  dropdown: 'dropdown_9fe36029',
+  dropdownTitle: 'dropdownTitle_9fe36029',
+  chevron: 'chevron_9fe36029',
+  utilityBar: 'utilityBar_9fe36029',
+  searchBox: 'searchBox_9fe36029',
+  utilityIcon: 'utilityIcon_9fe36029'
 };
 
 export default styles;

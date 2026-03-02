@@ -9,12 +9,18 @@ import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
 
 import CustomerContactCards from './components/CustomerContactCards';
 import { ICustomerContactCardsProps } from './components/ICustomerContactCardsProps';
+import { initializeSP } from './services/spConfig';
 
 export interface ICustomerContactCardsWebPartProps {
   title: string;
 }
 
 export default class CustomerContactCardsWebPart extends BaseClientSideWebPart<ICustomerContactCardsWebPartProps> {
+
+  protected async onInit(): Promise<void> {
+    await super.onInit();
+    initializeSP(this.context);
+  }
 
   public render(): void {
     const element: React.ReactElement<ICustomerContactCardsProps> = React.createElement(

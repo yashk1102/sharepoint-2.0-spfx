@@ -1,15 +1,12 @@
 import * as React from 'react';
 import styles from './CustomerContactCards.module.scss';
 import { ICustomerContactCardsProps } from './ICustomerContactCardsProps';
-import { MOCK_CUSTOMERS, ICustomer } from './mockData';
+import { ICustomer } from './mockData';
 import CardGridView from './CardGridView';
 import CustomerDetailView from './CustomerDetailView';
 import { Navigation } from '../../rapidCityHomepage/components/Navigation/Navigation';
 import { defaultTheme, getThemeCssVariables } from '../../rapidCityHomepage/theme/ThemeTokens';
-
-// TODO: Replace MOCK_CUSTOMERS with live data from SharePoint List
-// TODO: Use PnPjs sp.web.lists.getByTitle('CustomerContacts').items.get()
-// TODO: Map SharePoint list items to ICustomer[] using a mapper function
+import { useProtocolBook } from '../hooks/useProtocolBook';
 
 type ViewState = 'grid' | 'detail';
 
@@ -20,27 +17,50 @@ const CustomerContactCards: React.FC<ICustomerContactCardsProps> = ({ title }) =
 
   const themeVars = React.useMemo(() => getThemeCssVariables(defaultTheme), []);
 
-  // TODO: Replace with useEffect data fetch from SharePoint
-  const customers = MOCK_CUSTOMERS;
+  // Live SharePoint data via hook
+  const {
+    customers,
+    customerDetail,
+    gridLoading,
+    detailLoading,
+    error,
+    loadCustomerDetail,
+    clearDetail,
+  } = useProtocolBook();
 
-  const handleCardClick = (customer: ICustomer): void => {
+  // When detail data arrives from the API, update the selected customer
+  // with the fully-hydrated version (replaces the lightweight grid stub).
+  React.useEffect(() => {
+    if (customerDetail && view === 'detail') {
+      setSelectedCustomer(customerDetail);
+    }
+  }, [customerDetail, view]);
+
+  const handleCardClick = React.useCallback((customer: ICustomer): void => {
+    // Show the lightweight customer immediately (header renders while detail loads)
     setSelectedCustomer(customer);
     setView('detail');
-    // Scroll back to top of web part on navigation
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
 
-  const handleBack = (): void => {
+    // Fetch full detail with expanded lookups
+    const numericId = parseInt(customer.id, 10);
+    if (!isNaN(numericId)) {
+      loadCustomerDetail(numericId).catch(() => { /* error handled inside hook */ });
+    }
+  }, [loadCustomerDetail]);
+
+  const handleBack = React.useCallback((): void => {
     setView('grid');
     setSelectedCustomer(null);
-  };
+    clearDetail();
+  }, [clearDetail]);
 
   const handleNavSearch = React.useCallback((query: string) => {
     setSearchQuery(query);
-    // If user searches while viewing a detail card, switch back to the grid
     setView('grid');
     setSelectedCustomer(null);
-  }, []);
+    clearDetail();
+  }, [clearDetail]);
 
   return (
     <div className={styles.webPartContainer} style={themeVars as React.CSSProperties}>
@@ -54,7 +74,20 @@ const CustomerContactCards: React.FC<ICustomerContactCardsProps> = ({ title }) =
         <h1 className={styles.pageHeading}>{title}</h1>
       )}
 
-      {view === 'grid' && (
+      {/* ---- Grid view ---- */}
+      {view === 'grid' && gridLoading && (
+        <div className={styles.emptyState} role="status" aria-live="polite">
+          <p>Loading customers…</p>
+        </div>
+      )}
+
+      {view === 'grid' && error && !gridLoading && (
+        <div className={styles.emptyState} role="alert">
+          <p>{error}</p>
+        </div>
+      )}
+
+      {view === 'grid' && !gridLoading && (
         <CardGridView
           allCustomers={customers}
           onCardClick={handleCardClick}
@@ -62,7 +95,27 @@ const CustomerContactCards: React.FC<ICustomerContactCardsProps> = ({ title }) =
         />
       )}
 
-      {view === 'detail' && selectedCustomer && (
+      {/* ---- Detail view ---- */}
+      {view === 'detail' && detailLoading && (
+        <div className={styles.emptyState} role="status" aria-live="polite">
+          <p>Loading customer details…</p>
+        </div>
+      )}
+
+      {view === 'detail' && error && !detailLoading && (
+        <div className={styles.emptyState} role="alert">
+          <p>{error}</p>
+          <button
+            className={styles.clearButton}
+            onClick={handleBack}
+            type="button"
+          >
+            Back to All Contacts
+          </button>
+        </div>
+      )}
+
+      {view === 'detail' && selectedCustomer && !detailLoading && (
         <CustomerDetailView
           customer={selectedCustomer}
           onBack={handleBack}

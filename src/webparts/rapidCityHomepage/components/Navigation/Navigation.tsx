@@ -19,6 +19,15 @@ export interface INavDropdown {
   options: INavLink[];
 }
 
+const EMPLOYEE_SUPPORT_OPTIONS: INavLink[] = [
+  { label: 'Training Hub', href: '#' },
+  { label: 'Rise Hub', href: '#' },
+  { label: 'Employee Directory', href: '#' },
+  { label: 'Information Technology Support', href: '#' },
+  { label: 'Human Resources Support', href: '#' },
+  // Update hrefs to real intranet pages
+];
+
 const DEPARTMENT_HUBS_OPTIONS: INavLink[] = [
   { label: 'Customer Experience', href: '#' },
   { label: 'Dispatch', href: '#' },
@@ -26,13 +35,6 @@ const DEPARTMENT_HUBS_OPTIONS: INavLink[] = [
   { label: 'Human Resources', href: '#' },
   { label: 'Information Technology', href: '#' },
   { label: 'Business Development', href: '#' },
-  // Update hrefs to real intranet pages
-];
-
-const EMPLOYEE_SUPPORT_OPTIONS: INavLink[] = [
-  { label: 'Information Technology Support', href: '#' },
-  { label: 'Human Resources Support', href: '#' },
-  { label: 'Health & Safety', href: '#' },
   // Update hrefs to real intranet pages
 ];
 
@@ -52,25 +54,26 @@ export const Navigation: React.FC<INavigationProps> = (props) => {
   const activePage = props.activePage || 'home';
   const homeUrl = props.homeUrl || '/';
   const contactCardsUrl = props.contactCardsUrl || '#';
-  const deptOptions: IDropdownOption[] = DEPARTMENT_HUBS_OPTIONS.map((o, i) => ({
-    key: o.href,
-    text: o.label,
-    data: o,
-  }));
 
   const supportOptions: IDropdownOption[] = EMPLOYEE_SUPPORT_OPTIONS.map((o) => ({
-    key: o.href,
+    key: o.label,
     text: o.label,
     data: o,
   }));
 
-  const onDeptChange: IDropdownProps['onChange'] = (_ev, option) => {
+  const deptOptions: IDropdownOption[] = DEPARTMENT_HUBS_OPTIONS.map((o) => ({
+    key: o.label,
+    text: o.label,
+    data: o,
+  }));
+
+  const onSupportChange: IDropdownProps['onChange'] = (_ev, option) => {
     if (option?.data?.href) {
       window.location.assign((option.data as INavLink).href);
     }
   };
 
-  const onSupportChange: IDropdownProps['onChange'] = (_ev, option) => {
+  const onDeptChange: IDropdownProps['onChange'] = (_ev, option) => {
     if (option?.data?.href) {
       window.location.assign((option.data as INavLink).href);
     }
@@ -84,6 +87,7 @@ export const Navigation: React.FC<INavigationProps> = (props) => {
     <nav className={styles.nav} role="navigation" aria-label="Main">
       <div className={styles.navInner}>
         <ul className={styles.list}>
+          {/* 1. Home */}
           <li className={styles.listItem}>
             <a
               href={homeUrl}
@@ -93,46 +97,15 @@ export const Navigation: React.FC<INavigationProps> = (props) => {
               Home
             </a>
           </li>
+
+          {/* 2. All About the Company */}
           <li className={styles.listItem}>
-            <a
-              href={contactCardsUrl}
-              className={activePage === 'contactCards' ? styles.linkActive : styles.link}
-              {...(activePage === 'contactCards' ? { 'aria-current': 'page' as const } : {})}
-            >
-              Contact Cards
+            <a href="#" className={styles.link}>
+              All About the Company
             </a>
           </li>
-          <li className={styles.listItem}>
-            <Dropdown
-              placeholder="Department Hubs"
-              options={deptOptions}
-              onChange={onDeptChange}
-              className={styles.dropdown}
-              ariaLabel="Department Hubs menu"
-              dropdownWidth={220}
-              onRenderPlaceholder={() => (
-                <span className={styles.dropdownTitle}>
-                  Department Hubs
-                  <Icon iconName="ChevronDown" className={styles.chevron} />
-                </span>
-              )}
-              onRenderTitle={() => (
-                <span className={styles.dropdownTitle}>
-                  Department Hubs
-                  <Icon iconName="ChevronDown" className={styles.chevron} />
-                </span>
-              )}
-            />
-          </li>
-          <li className={styles.listItem}>
-            <a
-              href="#"
-              className={activePage === 'training' ? styles.linkActive : styles.link}
-              {...(activePage === 'training' ? { 'aria-current': 'page' as const } : {})}
-            >
-              Training Hub
-            </a>
-          </li>
+
+          {/* 3. Employee Support (dropdown: Training Hub, Rise HUB, Employee Directory) */}
           <li className={styles.listItem}>
             <Dropdown
               placeholder="Employee Support"
@@ -155,11 +128,46 @@ export const Navigation: React.FC<INavigationProps> = (props) => {
               )}
             />
           </li>
+
+          {/* 4. Department Hubs (dropdown) */}
+          <li className={styles.listItem}>
+            <Dropdown
+              placeholder="Department Hubs"
+              options={deptOptions}
+              onChange={onDeptChange}
+              className={styles.dropdown}
+              ariaLabel="Department Hubs menu"
+              dropdownWidth={220}
+              onRenderPlaceholder={() => (
+                <span className={styles.dropdownTitle}>
+                  Department Hubs
+                  <Icon iconName="ChevronDown" className={styles.chevron} />
+                </span>
+              )}
+              onRenderTitle={() => (
+                <span className={styles.dropdownTitle}>
+                  Department Hubs
+                  <Icon iconName="ChevronDown" className={styles.chevron} />
+                </span>
+              )}
+            />
+          </li>
+
+          {/* 5. Contact Cards */}
+          <li className={styles.listItem}>
+            <a
+              href={contactCardsUrl}
+              className={activePage === 'contactCards' ? styles.linkActive : styles.link}
+              {...(activePage === 'contactCards' ? { 'aria-current': 'page' as const } : {})}
+            >
+              Contact Cards
+            </a>
+          </li>
         </ul>
 
         <div className={styles.utilityBar} role="group" aria-label="Search and utility actions">
           <SearchBox
-            placeholder="Search contact cards"
+            placeholder="Search for Contact Cards"
             onSearch={handleSearch}
             onClear={() => props.onSearch('')}
             ariaLabel="Search for customer contact card"
