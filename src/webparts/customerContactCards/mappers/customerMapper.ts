@@ -1,91 +1,80 @@
-// ============================================================
-// Mapper — transforms raw SharePoint data into ICustomer shape
-// ============================================================
-//
-// ASSUMPTIONS (documented for future maintainers):
-//
-// 1. The "Source" field on instruction blocks uses these values:
-//      "Client"    → maps to the "Referral" tab
-//      "Passenger" → maps to the "Passenger" tab
-//      "Customer"  → maps to the "Customer" tab
-//    If your list uses different values, update SOURCE_TO_TAB below.
-//
-// 2. Lookup columns map to accordion sections as defined in
-//    LOOKUP_TO_SECTION below. Adjust if your list layout differs.
-//
-// 3. The "Default Text" field on instruction blocks contains multiline
-//    plain text. Each non-empty line becomes a bullet item in the UI.
-//
-// 4. "Phone Numbers (Business Hours)" and "Phone Numbers (After Hours)"
-//    are multiline text fields. The first phone-like value is extracted
-//    for the card grid; the full text is parsed for the detail view.
-//
-// 5. There is NO dedicated "Email" column in Protocol Book Draft2.
-//    If emails are embedded in the phone fields (e.g., "Email: foo@bar.com"),
-//    the mapper tries to extract them. Otherwise the email shows as empty.
-// ============================================================
-
 import {
   ICustomer,
   ITabContent,
   IInstructionGroup,
-  IBusinessHoursContact,
-  IContactPerson,
+  IInstructionItem,
   CustomerType,
-  ServiceAmendmentOption,
-} from '../components/mockData';
+  TabId,
+} from '../components/types';
 import {
   IProtocolBookGridItem,
   IProtocolBookDetailItem,
   IInstructionBlockRaw,
 } from '../models/IProtocolBookItem';
 
-/** Which ITabContent section each Protocol Book lookup column feeds. */
-type SectionKey = 'booking' | 'cancellationsAndChanges' | 'reminderCalls';
+type SectionKey = 'booking' | 'serviceAmendments' | 'cancellationsAndChanges' | 'reminderCalls';
 
 const LOOKUP_TO_SECTION: Record<string, SectionKey> = {
-  // Booking section (also feeds Service Amendments via AMENDMENT_KEY_MAP)
   ApptType: 'booking',
   ServiceType: 'booking',
+  Confirmations: 'booking',
   VehicleTypePolicy: 'booking',
   ReturnTimesPolicy: 'booking',
-  WaitTimes: 'booking',
-  // Reminder Calls section (ConfirmationCall only — WaitTimes is NOT here)
+  ServiceAmendments: 'serviceAmendments',
+  WaitTimes: 'serviceAmendments',
   ConfirmationCall: 'reminderCalls',
-  // Cancellations & Changes section
   ChangePolicy: 'cancellationsAndChanges',
   CancelPolicy: 'cancellationsAndChanges',
 };
 
 /**
- * Maps instruction block titles/categories to SERVICE_AMENDMENT_OPTIONS keys
- * so the Service Amendments dropdown can find the right content.
- * Expand this map as new amendment types appear in your list.
+ * Parse ClientRole to determine which tabs are visible.
+ * If the role contains both "Referral" and "Customer" (e.g. "Referral & Customer"),
+ * the Customer tab is hidden — its blocks are merged into Referral.
  */
-const AMENDMENT_KEY_MAP: Record<string, ServiceAmendmentOption> = {
-  // Category-based
-  'Wait Times': 'Wait & Return',
-  'Wait Time': 'Wait & Return',
-  'Return Times': 'Wait & Return',
-  'Vehicle Type': 'Fleet-Only Service',
-  // Title-pattern based (add more as needed)
-  Stretcher: 'Stretcher Requirements',
-  'Toll Road': 'Toll Roads (407 / 412)',
-  'Address Alert': 'Address Alerts',
-  'Flight': 'Flight / Hotels',
-  'Group Travel': 'Group Travel (Multiple Passengers)',
-  'Driver Transfer': 'Driver Transfer',
-  'Assessor Transfer': 'Assessor Transfer',
-  TSP: 'TSP',
-};
+function parseVisibleTabs(role?: string): TabId[] {
+  if (!role) return ['referral', 'passenger', 'customer'];
 
-// ---- Grid mapper (lightweight) ----
+  const lower = role.toLowerCase();
+  const hasReferral = lower.includes('referral');
+  const hasCustomer = lower.includes('customer');
+  const hasPassenger = lower.includes('passenger');
+
+  // Combined roles — hide the redundant tab
+  if (hasReferral && hasCustomer) {
+    return ['referral', 'passenger'];
+  }
+  if (hasReferral && hasPassenger) {
+    return ['referral', 'customer'];
+  }
+  if (hasCustomer && hasPassenger) {
+    return ['passenger', 'customer'];
+  }
+
+  // Default: show all three
+  return ['referral', 'passenger', 'customer'];
+}
 
 /**
- * Map a list of Protocol Book grid items to ICustomer[] for the card grid.
- * Only populates the fields the card + filter/search need.
- * Tab content is left as empty stubs — it will be populated on detail fetch.
+ * Merge two BlocksBySection maps: appends blocks from `b` into `a` per section.
+ * Returns a new object (does not mutate inputs).
  */
+function mergeBlocksBySections(a: BlocksBySection, b: BlocksBySection): BlocksBySection {
+  const result: BlocksBySection = {};
+  const allSections: SectionKey[] = ['booking', 'serviceAmendments', 'cancellationsAndChanges', 'reminderCalls'];
+  for (const key of allSections) {
+    const aBlocks = a[key] || [];
+    const bBlocks = b[key] || [];
+    const seenIds = new Set(aBlocks.map(block => block.Id));
+    const deduped = [...aBlocks, ...bBlocks.filter(block => !seenIds.has(block.Id))];
+    if (deduped.length > 0) {
+      result[key] = deduped;
+    }
+  }
+  return result;
+}
+
+/** Map grid items to lightweight ICustomer[] for the card view. */
 export function mapGridItemsToCustomers(items: IProtocolBookGridItem[]): ICustomer[] {
   return items.map(item => {
     const phone = extractFirstPhone(item.PhoneBusinessHours);
@@ -95,63 +84,111 @@ export function mapGridItemsToCustomers(items: IProtocolBookGridItem[]): ICustom
       id: String(item.Id),
       name: item.Title || item.ClientName || '',
       customerType: mapCustomerType(item.ClientType),
-      role: item.ClientRole || '',
+      customerTypeDisplay: item.ClientType || 'Other',
       bio: item.Specification || '',
       phone,
       email,
-      // Stub tab content — will be hydrated when user opens detail
       referral: emptyTabContent(),
       passenger: emptyTabContent(),
       customer: emptyTabContent(),
+      visibleTabs: parseVisibleTabs(item.ClientRole),
+      clientRole: item.ClientRole || undefined,
     };
   });
 }
 
-// ---- Detail mapper (full) ----
-
-/**
- * Map a fully-expanded Protocol Book item into a complete ICustomer
- * with all three tab contents populated from instruction blocks.
- */
+/** Map a full Protocol Book item into a complete ICustomer with all tab data. */
 export function mapDetailItemToCustomer(item: IProtocolBookDetailItem): ICustomer {
   const phone = extractFirstPhone(item.PhoneBusinessHours);
   const email = extractEmail(item.PhoneBusinessHours);
   const orgName = item.ClientName || item.Title || '';
 
-  // Collect ALL instruction blocks from every lookup, tagged with their source column
   const blocksByTab = collectBlocksByTab(item);
+  const visibleTabs = parseVisibleTabs(item.ClientRole);
 
-  // Build tab content for each of the 3 tabs
-  const referralBlocks = blocksByTab.Client || {};
-  const passengerBlocks = blocksByTab.Passenger || {};
-  const customerBlocks = blocksByTab.Customer || {};
+  let referralBlocks = blocksByTab.Client || {};
+  let passengerBlocks = blocksByTab.Passenger || {};
+  let customerBlocks = blocksByTab.Customer || {};
+
+  // Merge blocks from hidden tabs into visible ones
+  if (visibleTabs.indexOf('customer') === -1 && visibleTabs.indexOf('referral') !== -1) {
+    // "Referral & Customer" — merge Customer blocks into Referral
+    referralBlocks = mergeBlocksBySections(referralBlocks, customerBlocks);
+    customerBlocks = {};
+  } else if (visibleTabs.indexOf('referral') === -1 && visibleTabs.indexOf('customer') !== -1) {
+    // "Customer & Passenger" — merge Referral blocks into Customer
+    customerBlocks = mergeBlocksBySections(customerBlocks, referralBlocks);
+    referralBlocks = {};
+  }
+
+  if (visibleTabs.indexOf('passenger') === -1 && visibleTabs.indexOf('referral') !== -1) {
+    // "Referral & Passenger" — merge Passenger blocks into Referral
+    referralBlocks = mergeBlocksBySections(referralBlocks, passengerBlocks);
+    passengerBlocks = {};
+  }
 
   return {
     id: String(item.Id),
     name: item.Title || orgName,
     customerType: mapCustomerType(item.ClientType),
-    role: item.ClientRole || '',
+    customerTypeDisplay: item.ClientType || '',
     bio: item.Specification || '',
     phone,
     email,
     referral: buildTabContent(referralBlocks, item, orgName),
     passenger: buildTabContent(passengerBlocks, item, orgName),
     customer: buildTabContent(customerBlocks, item, orgName),
+    visibleTabs,
+    clientRole: item.ClientRole || undefined,
+
+    accountNumber: rawField(item.AccountNumber),
+    customerField: rawField(item.Customer),
+    passengerName: cleanField(item.PassengerName),
+    specialInstructions: rawField(item.SpecialInstructions),
+    okToBill3rdParty: item.OkToBill3rdParty || undefined,
+    passengerNotes: rawField(item.PassengerNotes),
+    unitInfo: rawField(item.UnitInfo),
+    tripNotes: rawField(item.TripNotes),
+    referralOptions: rawField(item.ReferralOptions),
+    confirmationsSpecific: rawField(item.ConfirmationsSpecific),
   };
 }
 
-// ============================================================
-// Internal helpers
-// ============================================================
+// ---- Internal helpers ----
 
-// -- Tab content builder --
+/** Strip HTML and return trimmed string, or undefined if empty. */
+function cleanField(val?: string): string | undefined {
+  if (!val) return undefined;
+  const clean = stripHtml(val).trim();
+  return clean.length > 0 ? clean : undefined;
+}
+
+/**
+ * Return raw HTML if it has any text content, or undefined if empty.
+ * SharePoint sometimes returns rich text with entity-encoded angle brackets
+ * (e.g. &lt;div&gt; instead of <div>), so we decode those first.
+ */
+function rawField(val?: string): string | undefined {
+  if (!val) return undefined;
+
+  let html = val;
+  // Decode up to 2 levels of entity-encoding (SharePoint can double-encode)
+  for (let i = 0; i < 2 && /&lt;\w/.test(html); i++) {
+    html = html
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'");
+  }
+
+  const clean = stripHtml(html).trim();
+  return clean.length > 0 ? html : undefined;
+}
 
 type BlocksBySection = Partial<Record<SectionKey, IInstructionBlockRaw[]>>;
 
-/**
- * Organize all instruction blocks from expanded lookups into
- * { [Source]: { [SectionKey]: IInstructionBlockRaw[] } }
- */
+/** Group all instruction blocks by Source (tab) and section. */
 function collectBlocksByTab(
   item: IProtocolBookDetailItem
 ): Record<string, BlocksBySection> {
@@ -160,8 +197,10 @@ function collectBlocksByTab(
   const lookupEntries: Array<{ key: string; blocks: IInstructionBlockRaw[] }> = [
     { key: 'ApptType', blocks: item.ApptType ? [item.ApptType] : [] },
     { key: 'ServiceType', blocks: item.ServiceType || [] },
+    { key: 'ServiceAmendments', blocks: item.ServiceAmendments || [] },
     { key: 'VehicleTypePolicy', blocks: item.VehicleTypePolicy || [] },
     { key: 'ReturnTimesPolicy', blocks: item.ReturnTimesPolicy ? [item.ReturnTimesPolicy] : [] },
+    { key: 'Confirmations', blocks: item.Confirmations || [] },
     { key: 'ConfirmationCall', blocks: item.ConfirmationCall || [] },
     { key: 'WaitTimes', blocks: item.WaitTimes ? [item.WaitTimes] : [] },
     { key: 'ChangePolicy', blocks: item.ChangePolicy || [] },
@@ -173,8 +212,6 @@ function collectBlocksByTab(
     if (!section) continue;
 
     for (const block of blocks) {
-      // Use the block's Source field to determine which tab it belongs to.
-      // If Source is missing, put it in all tabs (defensive).
       const sources: string[] = block.Source
         ? [block.Source]
         : ['Client', 'Passenger', 'Customer'];
@@ -190,122 +227,148 @@ function collectBlocksByTab(
   return result;
 }
 
-/**
- * Build a complete ITabContent for one tab from collected instruction blocks.
- *
- * Service Amendments is NOT a lookup — it's a frontend-only dropdown whose
- * content is derived from the same booking blocks filtered by Category.
- */
+/** Build ITabContent for one tab. Splits "Wait Time" blocks into the top bar. */
 function buildTabContent(
   sections: BlocksBySection,
   item: IProtocolBookDetailItem,
   orgName: string
 ): ITabContent {
+  const saBlocks = sections.serviceAmendments || [];
+  const waitTimeBlock = saBlocks.find(b => /^Wait Time/i.test(b.Category || ''));
+  const amendmentBlocks = saBlocks.filter(b => !/^Wait Time/i.test(b.Category || ''));
+
+  // Move any "Confirmation Call" blocks out of booking into reminder calls
+  const bookingBlocks = (sections.booking || []).filter(b => !/^Confirmation Call/i.test(b.Category || ''));
+  const misplacedConfCalls = (sections.booking || []).filter(b => /^Confirmation Call/i.test(b.Category || ''));
+  const reminderBlocks = [...(sections.reminderCalls || []), ...misplacedConfCalls];
+
+  const waitTimeGroups = buildInstructionGroups(waitTimeBlock ? [waitTimeBlock] : []);
   return {
-    booking: buildInstructionGroups(sections.booking),
-    serviceAmendments: buildServiceAmendments(sections.booking),
-    cancellationsAndChanges: buildInstructionGroups(sections.cancellationsAndChanges),
-    reminderCalls: buildReminderCalls(sections.reminderCalls, item.ProblemWithReminderCall),
+    booking: buildInstructionGroups(bookingBlocks),
+    serviceAmendments: buildServiceAmendments(amendmentBlocks),
+    waitTime: waitTimeGroups.length > 0 ? waitTimeGroups[0] : undefined,
+    cancellationsAndChanges: buildInstructionGroups(sections.cancellationsAndChanges)
+      .sort((a, b) => {
+        const aIsChange = /change/i.test(a.title) ? 0 : 1;
+        const bIsChange = /change/i.test(b.title) ? 0 : 1;
+        return aIsChange - bIsChange;
+      }),
+    reminderCalls: buildReminderCalls(reminderBlocks, item.ProblemWithReminderCall),
     contactInformation: buildContactInformation(item, orgName),
   };
 }
 
-// -- Section builders --
-
-/**
- * Convert instruction blocks into IInstructionGroup[].
- * Each block becomes one group: Title → group title, DefaultText lines → items.
- */
+/** Convert instruction blocks into groups (Category = heading, DefaultText = items).
+ *  Merges blocks with the same Category under one heading. */
 function buildInstructionGroups(
   blocks: IInstructionBlockRaw[] | undefined
 ): IInstructionGroup[] {
   if (!blocks || blocks.length === 0) return [];
 
-  return blocks.map(block => ({
-    title: block.Title || 'Instructions',
-    items: parseMultilineToItems(block.DefaultText, block.Description),
-  }));
-}
-
-/**
- * Map instruction blocks into the ServiceAmendments Record structure.
- * Tries to match each block to a SERVICE_AMENDMENT_OPTION key.
- */
-function buildServiceAmendments(
-  blocks: IInstructionBlockRaw[] | undefined
-): Partial<Record<ServiceAmendmentOption, IInstructionGroup[]>> {
-  if (!blocks || blocks.length === 0) return {};
-
-  const result: Partial<Record<ServiceAmendmentOption, IInstructionGroup[]>> = {};
+  const merged = new Map<string, IInstructionGroup>();
 
   for (const block of blocks) {
-    const amendmentKey = resolveAmendmentKey(block);
-    if (!amendmentKey) continue;
+    const title = block.Category || 'Instructions';
+    const existing = merged.get(title);
 
-    if (!result[amendmentKey]) result[amendmentKey] = [];
-    result[amendmentKey]!.push({
-      title: block.Title || 'Instructions',
-      items: parseMultilineToItems(block.DefaultText, block.Description),
-    });
+    if (existing) {
+      existing.items.push(...parseMultilineToItems(block.DefaultText));
+      if (block.DefaultText) {
+        existing.rawHtml = existing.rawHtml
+          ? existing.rawHtml + block.DefaultText
+          : block.DefaultText;
+      }
+      if (!existing.approvalToModify && block.ApprovalToModify) {
+        existing.approvalToModify = block.ApprovalToModify;
+      }
+    } else {
+      merged.set(title, {
+        title,
+        description: parseTooltipText(block.Description),
+        items: parseMultilineToItems(block.DefaultText),
+        rawHtml: block.DefaultText,
+        approvalToModify: block.ApprovalToModify || undefined,
+      });
+    }
   }
 
-  return result;
+  return Array.from(merged.values());
 }
 
-/**
- * Build the reminderCalls sub-structure.
- * Uses ConfirmationCall instruction blocks as groups,
- * plus the plain-text ProblemWithReminderCall field.
- * NOTE: WaitTimes goes to Service Amendments ("Wait & Return"), NOT here.
- */
+/** Build service amendment groups, deduplicating by block ID and merging by Category. */
+function buildServiceAmendments(
+  blocks: IInstructionBlockRaw[] | undefined
+): IInstructionGroup[] {
+  if (!blocks || blocks.length === 0) return [];
+
+  const seen = new Set<number>();
+  const unique: IInstructionBlockRaw[] = [];
+  for (const block of blocks) {
+    if (!seen.has(block.Id)) {
+      seen.add(block.Id);
+      unique.push(block);
+    }
+  }
+
+  const merged = new Map<string, IInstructionGroup>();
+  for (const block of unique) {
+    const category = block.Category || 'Instructions';
+    const existing = merged.get(category);
+
+    if (existing) {
+      existing.items.push(...parseMultilineToItems(block.DefaultText));
+      if (block.DefaultText) {
+        existing.rawHtml = existing.rawHtml
+          ? existing.rawHtml + block.DefaultText
+          : block.DefaultText;
+      }
+      if (!existing.approvalToModify && block.ApprovalToModify) {
+        existing.approvalToModify = block.ApprovalToModify;
+      }
+    } else {
+      merged.set(category, {
+        title: category,
+        description: parseTooltipText(block.Description),
+        items: parseMultilineToItems(block.DefaultText),
+        rawHtml: block.DefaultText,
+        approvalToModify: block.ApprovalToModify || undefined,
+      });
+    }
+  }
+
+  return Array.from(merged.values());
+}
+
 function buildReminderCalls(
   blocks: IInstructionBlockRaw[] | undefined,
   problemWithReminderCall?: string
 ): ITabContent['reminderCalls'] {
   return {
     instructionGroups: buildInstructionGroups(blocks),
-    problemWithReminderCall: problemWithReminderCall ? stripHtml(problemWithReminderCall).trim() || undefined : undefined,
+    problemWithReminderCall: rawField(problemWithReminderCall),
   };
 }
 
-/**
- * Build contact information from the Protocol Book item's flat fields.
- * Parses the multiline phone fields into the structured contact format.
- */
 function buildContactInformation(
   item: IProtocolBookDetailItem,
-  orgName: string
+  _orgName: string
 ): ITabContent['contactInformation'] {
-  const businessLines = splitLines(item.PhoneBusinessHours ? stripHtml(item.PhoneBusinessHours) : undefined);
-  const afterLines = splitLines(item.PhoneAfterHours ? stripHtml(item.PhoneAfterHours) : undefined);
-
   return {
     businessHours: 'Monday - Friday | 8:30 AM - 5:00 PM EST',
-    during: parseContactBlock(businessLines, orgName),
-    outside: parseContactBlock(afterLines, orgName),
+    duringHoursHtml: rawField(item.PhoneBusinessHours),
+    outsideHoursHtml: rawField(item.PhoneAfterHours),
   };
 }
 
-// ============================================================
-// Parsing utilities
-// ============================================================
+// ---- Parsing utilities ----
 
-/**
- * Strip HTML markup from SharePoint Rich Text (Note) fields.
- * Converts block-level elements to newlines, removes tags, decodes entities.
- */
+/** Strip HTML tags and decode entities from SharePoint rich text fields. */
 function stripHtml(html: string): string {
   let text = html;
-
-  // Convert block-level closing tags and <br> to newlines
   text = text.replace(/<br\s*\/?>/gi, '\n');
   text = text.replace(/<\/(?:div|p|li|tr|h[1-6])>/gi, '\n');
   text = text.replace(/<\/(?:ol|ul|table)>/gi, '\n');
-
-  // Remove all remaining HTML tags
   text = text.replace(/<[^>]*>/g, '');
-
-  // Decode common HTML entities
   text = text
     .replace(/&amp;/gi, '&')
     .replace(/&lt;/gi, '<')
@@ -314,11 +377,9 @@ function stripHtml(html: string): string {
     .replace(/&apos;/gi, "'")
     .replace(/&nbsp;/gi, ' ')
     .replace(/&#(\d+);/g, (_m, code) => String.fromCharCode(Number(code)));
-
   return text;
 }
 
-/** Split multiline text into non-empty trimmed lines. */
 function splitLines(text?: string): string[] {
   if (!text) return [];
   return text
@@ -328,30 +389,46 @@ function splitLines(text?: string): string[] {
 }
 
 /**
- * Parse multiline DefaultText + Description into instruction items.
- * Strips HTML markup (SharePoint Rich Text fields return HTML),
- * then splits into non-empty lines.
+ * Parse DefaultText into instruction items.
+ * If the text has address lines (e.g. "123 Main St"), groups each address
+ * with its following lines (Unit, Trip Note, etc.) as sub-bullets.
  */
-function parseMultilineToItems(
-  defaultText?: string,
-  description?: string
-): string[] {
-  const items: string[] = [];
+function parseMultilineToItems(defaultText?: string): (string | IInstructionItem)[] {
+  if (!defaultText) return ['No instructions available.'];
 
-  if (defaultText) {
-    items.push(...splitLines(stripHtml(defaultText)));
-  }
-  if (description) {
-    items.push(...splitLines(stripHtml(description)));
+  const lines = splitLines(stripHtml(defaultText));
+  if (lines.length === 0) return ['No instructions available.'];
+
+  const isAddressLine = (l: string): boolean => /^\d+\s+[A-Za-z]/.test(l);
+
+  if (!lines.some(isAddressLine)) {
+    return lines;
   }
 
+  const items: (string | IInstructionItem)[] = [];
+  let current: IInstructionItem | null = null;
+
+  for (const line of lines) {
+    if (isAddressLine(line)) {
+      if (current) items.push(current);
+      current = { text: line, subItems: [] };
+    } else if (current) {
+      current.subItems!.push(line);
+    } else {
+      items.push(line);
+    }
+  }
+
+  if (current) items.push(current);
   return items.length > 0 ? items : ['No instructions available.'];
 }
 
-/**
- * Extract the first phone-number-like string from multiline text.
- * Looks for patterns like "905-678-2924", "(416) 927-7745", "1-800-555-1234".
- */
+function parseTooltipText(description?: string): string | undefined {
+  if (!description) return undefined;
+  const clean = stripHtml(description).trim();
+  return clean.length > 0 ? clean : undefined;
+}
+
 function extractFirstPhone(text?: string): string {
   if (!text) return '';
   const clean = stripHtml(text);
@@ -359,9 +436,6 @@ function extractFirstPhone(text?: string): string {
   return match ? match[0].trim() : splitLines(clean)[0] || '';
 }
 
-/**
- * Try to extract an email address from multiline text.
- */
 function extractEmail(text?: string): string {
   if (!text) return '';
   const clean = stripHtml(text);
@@ -369,26 +443,16 @@ function extractEmail(text?: string): string {
   return match ? match[0] : '';
 }
 
-/**
- * Map a ClientType string from SP to the CustomerType union.
- * Falls back to 'IME Clinic' if the value doesn't match known types.
- */
 function mapCustomerType(raw?: string): CustomerType {
   const known: CustomerType[] = [
-    'IME Clinic',
-    'Treatment Clinic',
-    'Hospital',
-    'School',
-    'Social Services',
-    'Lawyer',
-    'Insurance Company',
+    'IME Clinic', 'Treatment Clinic', 'Hospital', 'School',
+    'Social Services', 'Lawyer', 'Insurance Company', 'WSIB'
   ];
 
   if (raw && known.indexOf(raw as CustomerType) !== -1) {
     return raw as CustomerType;
   }
 
-  // Try partial matching
   if (raw) {
     const lower = raw.toLowerCase();
     for (const t of known) {
@@ -398,104 +462,17 @@ function mapCustomerType(raw?: string): CustomerType {
     }
   }
 
-  return 'IME Clinic'; // safe fallback
+  return 'Other';
 }
 
-/**
- * Determine which SERVICE_AMENDMENT_OPTION key a block maps to.
- */
-function resolveAmendmentKey(
-  block: IInstructionBlockRaw
-): ServiceAmendmentOption | undefined {
-  const title = block.Title || '';
-  const category = block.Category || '';
-
-  // Try exact category match first
-  const patterns = Object.keys(AMENDMENT_KEY_MAP);
-  for (let i = 0; i < patterns.length; i++) {
-    const pattern = patterns[i];
-    const key = AMENDMENT_KEY_MAP[pattern];
-    if (
-      category.toLowerCase().indexOf(pattern.toLowerCase()) !== -1 ||
-      title.toLowerCase().indexOf(pattern.toLowerCase()) !== -1
-    ) {
-      return key;
-    }
-  }
-
-  // Fallback: use the block title as a best-effort key
-  // (won't match the dropdown unless it exactly matches a SERVICE_AMENDMENT_OPTION)
-  return undefined;
-}
-
-/**
- * Parse an array of text lines (from a phone field) into the structured
- * IBusinessHoursContact format with firstContact, secondContact, and escalation.
- */
-function parseContactBlock(lines: string[], orgName: string): IBusinessHoursContact {
-  const phones: string[] = [];
-  const emails: string[] = [];
-  const otherLines: string[] = [];
-
-  for (const line of lines) {
-    const emailMatch = line.match(/[\w.+-]+@[\w.-]+\.\w{2,}/);
-    const phoneMatch = line.match(/[\d(][\d\s().-]{6,}[\d)]/);
-
-    if (emailMatch) {
-      emails.push(emailMatch[0]);
-    }
-    if (phoneMatch) {
-      phones.push(phoneMatch[0].trim());
-    }
-    if (!emailMatch && !phoneMatch) {
-      otherLines.push(line);
-    }
-  }
-
-  const firstContact: IContactPerson = {
-    phone: phones[0] || '',
-    email: emails[0] || '',
-    phoneNotes: otherLines.length > 0 ? otherLines : undefined,
-  };
-
-  const secondContact: IContactPerson = {
-    phone: phones[1] || phones[0] || '',
-    email: emails[1] || emails[0] || '',
-  };
-
-  const escalationGuidelines: string[] = lines.length > 0
-    ? [`Contact ${orgName} dispatch for all trip-related inquiries.`]
-    : [];
-
-  return {
-    firstContact,
-    secondContact,
-    escalationGuidelines,
-  };
-}
-
-/**
- * Returns a completely empty ITabContent — used as a stub for grid items
- * that haven't been hydrated with detail data yet.
- */
 function emptyTabContent(): ITabContent {
   return {
     booking: [],
-    serviceAmendments: {},
+    serviceAmendments: [],
     cancellationsAndChanges: [],
     reminderCalls: { instructionGroups: [] },
     contactInformation: {
       businessHours: '',
-      during: {
-        firstContact: { phone: '', email: '' },
-        secondContact: { phone: '', email: '' },
-        escalationGuidelines: [],
-      },
-      outside: {
-        firstContact: { phone: '', email: '' },
-        secondContact: { phone: '', email: '' },
-        escalationGuidelines: [],
-      },
     },
   };
 }
