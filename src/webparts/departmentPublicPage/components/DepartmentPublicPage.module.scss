@@ -1,0 +1,418 @@
+@import '../../rapidCityHomepage/theme/themeVariables.module.scss';
+@import '../../rapidCityHomepage/theme/_rct-components';
+
+// ── SPFx full-width override ────────────────────────────────────────────────
+:global {
+  #workbenchPageContent,
+  .CanvasComponent.LCS .CanvasZone {
+    max-width: 100% !important;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//  Root container
+// ═══════════════════════════════════════════════════════════════════════════════
+
+.container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--rct-background);
+  color: var(--rct-text-primary);
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.skipLink {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 9999;
+  padding: var(--rct-spacing-sm) var(--rct-spacing-md);
+  background: var(--rct-primary);
+  color: var(--rct-text-inverse);
+  font-weight: 600;
+  font-size: 16px;
+  text-decoration: none;
+  border-radius: 0 0 var(--rct-border-radius) 0;
+
+  &:focus {
+    left: 0;
+    outline: var(--rct-focus-outline);
+    outline-offset: 2px;
+  }
+}
+
+.main {
+  flex: 1;
+}
+
+.configMessage {
+  max-width: 600px;
+  margin: var(--rct-spacing-2xl) auto;
+  padding: var(--rct-spacing-xl);
+  text-align: center;
+  color: var(--rct-text-secondary);
+  font-size: 16px;
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//  § 1. HERO / DEPARTMENT HEADER
+// ═══════════════════════════════════════════════════════════════════════════════
+
+.heroSection {
+  background: var(--rct-surface);
+  padding: var(--rct-spacing-2xl) var(--rct-spacing-lg);
+}
+
+.heroInner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--rct-spacing-2xl);
+  align-items: center;
+}
+
+.heroLeft {
+  display: flex;
+  flex-direction: column;
+}
+
+.heroTitle {
+  margin: 0 0 var(--rct-spacing-xs);
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 700;
+  color: var(--rct-text-primary);
+  line-height: 1.15;
+}
+
+.heroSubtitle {
+  margin: 0 0 var(--rct-spacing-lg);
+  font-size: 18px;
+  font-style: italic;
+  color: var(--rct-text-secondary);
+  line-height: 1.4;
+}
+
+.contactList {
+  list-style: none;
+  margin: 0 0 var(--rct-spacing-lg);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--rct-spacing-sm);
+}
+
+.contactItem {
+  display: flex;
+  align-items: center;
+  gap: var(--rct-spacing-sm);
+  font-size: 15px;
+  color: var(--rct-text-primary);
+  line-height: 1.5;
+}
+
+.contactIcon {
+  color: var(--rct-primary);
+  font-size: 18px;
+  flex-shrink: 0;
+  width: 24px;
+  text-align: center;
+}
+
+.contactLink {
+  color: var(--rct-text-primary);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+    color: var(--rct-secondary);
+  }
+
+  &:focus-visible {
+    outline: var(--rct-focus-outline);
+    outline-offset: var(--rct-focus-offset);
+    border-radius: var(--rct-border-radius);
+  }
+}
+
+// "View Department Resources" CTA — uses btnSecondary (Primary Blue bg + white text)
+.resourceBtn {
+  @extend .btnSecondary;
+  align-self: flex-start;
+}
+
+.heroRight {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.heroImageWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #DCDCDC;
+  border-radius: var(--rct-border-radius-lg);
+  min-height: 260px;
+  width: 100%;
+  overflow: hidden;
+}
+
+.heroImagePlaceholder {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--rct-text-secondary);
+  text-align: center;
+  padding: var(--rct-spacing-lg);
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//  § 2. WHAT'S NEW SECTION
+// ═══════════════════════════════════════════════════════════════════════════════
+
+.whatsNewSection {
+  background: var(--rct-background);
+  padding: var(--rct-spacing-2xl) var(--rct-spacing-lg);
+}
+
+.sectionInner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: var(--rct-spacing-lg);
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: clamp(20px, 2.5vw, 28px);
+  font-weight: 700;
+  color: var(--rct-text-primary);
+  line-height: 1.25;
+}
+
+.seeAllLink {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--rct-secondary);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+    color: var(--rct-secondary-hover);
+  }
+
+  &:focus-visible {
+    outline: var(--rct-focus-outline);
+    outline-offset: var(--rct-focus-offset);
+    border-radius: var(--rct-border-radius);
+  }
+}
+
+.newsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--rct-spacing-lg);
+}
+
+.newsCard {
+  background: var(--rct-background);
+  border: 1px solid var(--rct-border);
+  border-radius: var(--rct-border-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--rct-shadow-sm);
+  transition: box-shadow var(--rct-transition-medium),
+              transform var(--rct-transition-medium);
+
+  &:hover {
+    box-shadow: var(--rct-shadow-md);
+    transform: translateY(-2px);
+  }
+}
+
+.newsImageWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #DCDCDC;
+  min-height: 180px;
+  border-bottom: 1px solid var(--rct-border);
+}
+
+.newsImagePlaceholder {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--rct-text-secondary);
+}
+
+.newsBody {
+  padding: var(--rct-spacing-md);
+}
+
+.newsSource {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--rct-secondary);
+  text-decoration: none;
+  margin-bottom: var(--rct-spacing-xs);
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &:focus-visible {
+    outline: var(--rct-focus-outline);
+    outline-offset: var(--rct-focus-offset);
+    border-radius: var(--rct-border-radius);
+  }
+}
+
+.newsTitle {
+  margin: 0 0 var(--rct-spacing-sm);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--rct-text-primary);
+  line-height: 1.3;
+}
+
+.newsMeta {
+  font-size: 13px;
+  color: var(--rct-text-secondary);
+  margin: 0 0 var(--rct-spacing-sm);
+  line-height: 1.5;
+}
+
+.newsViews {
+  font-size: 13px;
+  color: var(--rct-text-secondary);
+  border-top: 1px solid var(--rct-border);
+  padding-top: var(--rct-spacing-sm);
+  margin: var(--rct-spacing-sm) 0 0;
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//  § 3. MEET THE DEPARTMENT LEADERS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+.leadersSection {
+  background: var(--rct-background);
+  padding: var(--rct-spacing-2xl) var(--rct-spacing-lg);
+
+  .sectionTitle {
+    margin-bottom: var(--rct-spacing-lg);
+  }
+}
+
+.leadersGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--rct-spacing-lg);
+}
+
+.leaderCard {
+  background: var(--rct-surface);
+  border: 1px solid var(--rct-border);
+  border-radius: var(--rct-border-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--rct-shadow-sm);
+}
+
+.leaderImageWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #DCDCDC;
+  height: 300px;
+  overflow: hidden;
+}
+
+.leaderPhoto {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.leaderImagePlaceholder {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--rct-text-secondary);
+}
+
+.leaderBody {
+  padding: var(--rct-spacing-md);
+}
+
+.leaderName {
+  margin: 0 0 var(--rct-spacing-xs);
+  font-size: 16px;
+  color: var(--rct-text-primary);
+  line-height: 1.3;
+}
+
+.leaderNameLabel {
+  font-weight: 700;
+}
+
+.leaderRole {
+  margin: 0 0 var(--rct-spacing-sm);
+  font-size: 15px;
+  color: var(--rct-text-primary);
+  line-height: 1.3;
+}
+
+.leaderRoleLabel {
+  font-weight: 700;
+}
+
+.leaderDescription {
+  font-size: 14px;
+  color: var(--rct-text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//  § 4. RESPONSIVE
+// ═══════════════════════════════════════════════════════════════════════════════
+
+@media (max-width: 960px) {
+  .heroInner {
+    grid-template-columns: 1fr;
+  }
+
+  .heroRight {
+    order: -1; // image on top on narrow screens
+  }
+
+  .newsGrid,
+  .leadersGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .newsGrid,
+  .leadersGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .sectionHeader {
+    flex-direction: column;
+    gap: var(--rct-spacing-sm);
+  }
+
+  .heroTitle {
+    font-size: 24px;
+  }
+}
