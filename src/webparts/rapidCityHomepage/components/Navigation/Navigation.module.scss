@@ -4,6 +4,9 @@
   background: var(--rct-surface-dark);          /* Primary Blue #1F4C7F */
   border-bottom: none;
   padding: 0 calc(var(--rct-spacing-unit) * 3);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
 .navInner {
@@ -56,6 +59,17 @@
   font-weight: 600;
 }
 
+.homeLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.homeIcon {
+  font-size: 18px;
+}
+
 .dropdown {
   :global(.ms-Dropdown-title) {
     border: none;
@@ -105,41 +119,152 @@
 }
 
 .searchBox {
+  position: relative;
   min-width: 220px;
   max-width: 350px;
+}
 
-  :global(.ms-SearchBox) {
-    background: rgba(255, 255, 255, 0.12);
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    border-radius: var(--rct-border-radius);
+.searchInputWrapper {
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: var(--rct-border-radius);
+  padding: 0 10px;
+
+  &:hover {
+    border-color: var(--rct-brand-gold);
   }
 
-  :global(.ms-SearchBox-field) {
-    color: var(--rct-text-inverse);
-
-    &::placeholder {
-      color: rgba(255, 255, 255, 0.85);
-      opacity: 1;
-    }
+  &:focus-within {
+    border-color: var(--rct-brand-gold);
+    box-shadow: 0 0 0 1px var(--rct-brand-gold);
   }
+}
 
-  :global(.ms-SearchBox-field::placeholder) {
-    color: rgba(255, 255, 255, 0.85);
+.searchIconInline {
+  color: var(--rct-brand-gold);
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.searchInput {
+  font-family: inherit;
+  font-size: 14px;
+  color: #1f4c7f;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 8px 0;
+  width: 100%;
+  min-width: 0;
+
+  &::placeholder {
+    color: #6b7280;
     opacity: 1;
   }
 
-  /* Fluent UI can also render placeholder text as a separate element */
-  :global(.ms-SearchBox-text) {
-    color: rgba(255, 255, 255, 0.85);
+  /* Hide browser default search clear button */
+  &::-webkit-search-cancel-button,
+  &::-webkit-search-decoration {
+    -webkit-appearance: none;
+    appearance: none;
   }
+}
 
-  :global(.ms-SearchBox-icon) {
-    color: var(--rct-brand-gold);
-  }
+.searchClear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #6b7280;
+  font-size: 12px;
+  padding: 4px;
+  flex-shrink: 0;
 
-  :global(.ms-SearchBox:hover) {
-    border-color: var(--rct-brand-gold);
+  &:hover {
+    color: #1f4c7f;
   }
+}
+
+// ---- Search Dropdown ----
+
+.searchDropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 4px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--rct-border-radius);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  z-index: 10000;
+  list-style: none;
+  padding: 4px 0;
+  max-height: 380px;
+  overflow-y: auto;
+}
+
+.searchResult {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: background 0.1s;
+
+  &:hover {
+    background: #f1f5f9;
+  }
+}
+
+.searchResultActive {
+  background: #e8f0fe;
+
+  &:hover {
+    background: #e8f0fe;
+  }
+}
+
+.searchResultName {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f4c7f;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.searchResultMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.searchResultBadge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 500;
+  color: #ffffff;
+  background: #1f4c7f;
+  border-radius: 3px;
+  padding: 1px 6px;
+  white-space: nowrap;
+}
+
+.searchNoResults {
+  padding: 12px 14px;
+  font-size: 13px;
+  color: #6b7280;
+  text-align: center;
 }
 
 .utilityIcon {

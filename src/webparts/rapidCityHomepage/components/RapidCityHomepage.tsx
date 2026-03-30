@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Navigation } from './Navigation/Navigation';
 import { Hero } from './Hero/Hero';
-import { DailyHighlight } from './DailyHighlight/DailyHighlight';
+import { BannerCarousel } from './BannerCarousel/BannerCarousel';
 import { Footer } from './Footer/Footer';
 import { defaultTheme, getThemeCssVariables } from '../theme/ThemeTokens';
 import { IRapidCityHomepageProps } from './IRapidCityHomepageProps';
@@ -53,15 +53,16 @@ export default function RapidCityHomepage(props: IRapidCityHomepageProps) {
       <Navigation
         onSearch={handleSearch}
         activePage="home"
+        homeUrl="https://rapidcitytransport.sharepoint.com/sites/HomeTest"
         contactCardsUrl={props.contactCardsPageUrl || '#'}
       />
 
       <main id="main-content" className={styles.main} role="main" tabIndex={-1}>
         <Hero />
-        <DailyHighlight />
+        <BannerCarousel />
       </main>
 
-      <Footer feedbackUrl={props.feedbackUrl} />
+      <Footer pageIdentifier="Home Page" />
     </div>
   );
 }

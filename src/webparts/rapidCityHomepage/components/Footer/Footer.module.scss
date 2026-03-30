@@ -7,7 +7,7 @@
   border-top: 3px solid var(--rct-brand-gold);  /* Gold accent strip */
   text-align: center;
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.80);            /* Light text on dark navy */
+  color: rgba(255, 255, 255, 0.80);
   flex-wrap: wrap;
   display: flex;
   align-items: center;
@@ -24,6 +24,14 @@
 }
 
 .feedback {
+  /* Reset button defaults */
+  font-family: inherit;
+  font-size: inherit;
+  border: none;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+
   color: var(--rct-brand-gold);                 /* Gold on dark navy: 6.05:1 → AA */
   text-decoration: underline;
   outline: none;
