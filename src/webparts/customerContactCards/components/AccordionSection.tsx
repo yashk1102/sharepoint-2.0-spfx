@@ -4,28 +4,38 @@ import styles from './CustomerContactCards.module.scss';
 export interface IAccordionSectionProps {
   id: string;
   title: string;
-  /** CSS colour value used for the title and border accent */
   accentColor: string;
-  /** Open on first render */
   defaultOpen?: boolean;
+  /** Controlled mode: parent manages open state */
+  isOpen?: boolean;
+  onToggle?: () => void;
+  /** Optional badge rendered beside the title */
+  badge?: React.ReactNode;
   children: React.ReactNode;
 }
 
-/** Methods exposed via ref */
 export interface IAccordionSectionHandle {
-  /** Expand the section and smoothly scroll it into view */
   openAndScroll: () => void;
 }
 
 const AccordionSection = React.forwardRef<IAccordionSectionHandle, IAccordionSectionProps>(
-  ({ id, title, accentColor, defaultOpen = false, children }, ref) => {
-    const [isOpen, setIsOpen] = React.useState(defaultOpen);
+  ({ id, title, accentColor, defaultOpen = false, isOpen: controlledOpen, onToggle, badge, children }, ref) => {
+    const [internalOpen, setInternalOpen] = React.useState(defaultOpen);
     const rootRef = React.useRef<HTMLDivElement>(null);
+
+    const isControlled = controlledOpen !== undefined && onToggle !== undefined;
+    const isOpen = isControlled ? controlledOpen : internalOpen;
 
     const headingId = `accordion-heading-${id}`;
     const panelId  = `accordion-panel-${id}`;
 
-    const toggle = (): void => setIsOpen(prev => !prev);
+    const toggle = (): void => {
+      if (isControlled) {
+        onToggle();
+      } else {
+        setInternalOpen(prev => !prev);
+      }
+    };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>): void => {
       if (e.key === 'Enter' || e.key === ' ') {
@@ -36,8 +46,11 @@ const AccordionSection = React.forwardRef<IAccordionSectionHandle, IAccordionSec
 
     React.useImperativeHandle(ref, () => ({
       openAndScroll: () => {
-        setIsOpen(true);
-        // Allow the DOM to update before scrolling
+        if (isControlled) {
+          if (!controlledOpen) onToggle();
+        } else {
+          setInternalOpen(true);
+        }
         requestAnimationFrame(() => {
           rootRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
@@ -61,6 +74,7 @@ const AccordionSection = React.forwardRef<IAccordionSectionHandle, IAccordionSec
         >
           <span className={styles.accordionTitle} style={{ color: accentColor }}>
             {title}
+            {badge && <>{' '}{badge}</>}
           </span>
           <span
             className={`${styles.accordionChevron} ${isOpen ? styles.accordionChevronOpen : ''}`}

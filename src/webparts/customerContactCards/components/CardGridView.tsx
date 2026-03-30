@@ -1,14 +1,13 @@
 import * as React from 'react';
 import styles from './CustomerContactCards.module.scss';
-import { ICustomer, CustomerType, CUSTOMER_TYPES } from './mockData';
+import { ICustomer, CustomerType, CUSTOMER_TYPES } from './types';
 import CustomerCard from './CustomerCard';
 
-const PAGE_SIZE = 12;
+const PAGE_SIZE = 15;
 
 interface ICardGridViewProps {
   allCustomers: ICustomer[];
   onCardClick: (customer: ICustomer) => void;
-  /** Optional external search query (e.g. from the nav bar search) */
   searchQuery?: string;
 }
 
@@ -16,15 +15,14 @@ const CardGridView: React.FC<ICardGridViewProps> = ({ allCustomers, onCardClick,
   const [filterType, setFilterType]   = React.useState<CustomerType | 'All'>('All');
   const [searchText, setSearchText]   = React.useState('');
   const [currentPage, setCurrentPage] = React.useState(1);
+  const [showAll, setShowAll]         = React.useState(false);
 
-  // Sync from nav-bar search into local search state
   React.useEffect(() => {
     if (searchQuery !== undefined) {
       setSearchText(searchQuery);
     }
   }, [searchQuery]);
 
-  // ---- Filtering & searching ----
   const filtered = React.useMemo(() => {
     let list = allCustomers;
     if (filterType !== 'All') {
@@ -43,24 +41,23 @@ const CardGridView: React.FC<ICardGridViewProps> = ({ allCustomers, onCardClick,
     return list;
   }, [allCustomers, filterType, searchText]);
 
-  // Reset to page 1 when filter/search changes
-  React.useEffect(() => { setCurrentPage(1); }, [filterType, searchText]);
+  // Reset pagination and collapse "show all" when filters change
+  React.useEffect(() => { setCurrentPage(1); setShowAll(false); }, [filterType, searchText]);
 
   const totalPages   = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const safePage     = Math.min(currentPage, totalPages);
   const pageStart    = (safePage - 1) * PAGE_SIZE;
-  const pageItems    = filtered.slice(pageStart, pageStart + PAGE_SIZE);
+  const pageItems    = showAll ? filtered : filtered.slice(pageStart, pageStart + PAGE_SIZE);
+  const needsPagination = filtered.length > PAGE_SIZE;
 
-  // ---- Count label ----
   const countLabel = React.useMemo(() => {
     const n = filtered.length;
     const plural = filterType === 'All'
       ? (n === 1 ? 'Contact' : 'Contacts')
       : `${filterType}${n !== 1 ? 's' : ''}`;
-    return `Showing ${n} ${plural}`;
+    return `${n} ${plural}`;
   }, [filtered.length, filterType]);
 
-  // ---- Handlers ----
   const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>): void => {
     setFilterType(e.target.value as CustomerType | 'All');
   };
@@ -82,10 +79,8 @@ const CardGridView: React.FC<ICardGridViewProps> = ({ allCustomers, onCardClick,
 
   return (
     <div className={styles.gridView}>
-      {/* ---- Filter bar ---- */}
       <div className={styles.filterBar} role="search" aria-label="Customer filter controls">
 
-        {/* Left: type filter + clear */}
         <div className={styles.filterGroup}>
           <label className={styles.filterLabel} htmlFor="ccc-type-filter">
             Customer Type
@@ -117,7 +112,6 @@ const CardGridView: React.FC<ICardGridViewProps> = ({ allCustomers, onCardClick,
           )}
         </div>
 
-        {/* Centre: search */}
         <div className={styles.searchWrapper}>
           <span className={styles.searchIcon} aria-hidden="true">🔍</span>
           <input
@@ -131,13 +125,24 @@ const CardGridView: React.FC<ICardGridViewProps> = ({ allCustomers, onCardClick,
           />
         </div>
 
-        {/* Right: count */}
-        <div className={styles.countText} aria-live="polite" aria-atomic="true">
-          {countLabel}
+        <div className={styles.countGroup} aria-live="polite" aria-atomic="true">
+          <span className={styles.countText}>{countLabel}</span>
+          {needsPagination && (
+            <>
+              <span className={styles.countDivider} aria-hidden="true">|</span>
+              <button
+                type="button"
+                className={styles.showAllButton}
+                onClick={() => setShowAll(prev => !prev)}
+                aria-label={showAll ? 'Show paginated view' : 'Show all contacts'}
+              >
+                {showAll ? 'Show Less' : 'Show All'}
+              </button>
+            </>
+          )}
         </div>
       </div>
 
-      {/* ---- Card grid ---- */}
       {pageItems.length > 0 ? (
         <div
           className={styles.cardGrid}
@@ -163,8 +168,7 @@ const CardGridView: React.FC<ICardGridViewProps> = ({ allCustomers, onCardClick,
         </div>
       )}
 
-      {/* ---- Pagination ---- */}
-      {totalPages > 1 && (
+      {!showAll && totalPages > 1 && (
         <nav className={styles.pagination} aria-label="Page navigation">
           <button
             className={styles.pageBtn}
