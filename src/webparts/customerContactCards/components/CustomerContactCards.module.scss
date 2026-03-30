@@ -204,19 +204,50 @@ $transition:      0.18s ease;
   }
 }
 
-// ---- Count text ----
-.countText {
+// ---- Count text + Show All toggle ----
+.countGroup {
   margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.countText {
   font-size: 13px;
   font-weight: 600;
   color: $primary-blue;
-  white-space: nowrap;
+}
+
+.countDivider {
+  color: $border;
+  font-size: 13px;
+  user-select: none;
+}
+
+.showAllButton {
+  @extend %focus-ring;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: $light-blue-acc;
+  background: transparent;
+  border: 1.5px solid $light-blue-acc;
+  border-radius: 20px;
+  padding: 3px 14px;
+  cursor: pointer;
+  transition: background $transition, color $transition;
+
+  &:hover {
+    background: $light-blue-acc;
+    color: #fff;
+  }
 }
 
 // ---- Card grid ----
 .cardGrid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 20px;
 
   // Ensure wrapper divs stretch so cards within each row share the same height
@@ -224,11 +255,15 @@ $transition:      0.18s ease;
     display: flex;
   }
 
-  @media (max-width: 1100px) {
+  @media (max-width: 1280px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  @media (max-width: 1024px) {
     grid-template-columns: repeat(3, 1fr);
   }
 
-  @media (max-width: 820px) {
+  @media (max-width: 768px) {
     grid-template-columns: repeat(2, 1fr);
   }
 
@@ -470,19 +505,37 @@ $transition:      0.18s ease;
   white-space: nowrap;
 }
 
-.detailRole {
-  font-size: 13.5px;
-  color: $text-secondary;
-  margin: 0 0 4px 0;
-  font-style: italic;
-}
 
 .detailBio {
-  font-size: 13px;
+  font-size: 16px;
   color: $text-secondary;
   margin: 0;
   max-width: 640px;
   line-height: 1.55;
+}
+
+// ---- Detail header metadata chips (Customer, Account #, Passenger) ----
+.detailMeta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-top: 10px;
+}
+
+.metaItem {
+  font-size: 13px;
+  color: $text-secondary;
+  background: $surface;
+  border: 1px solid $border-light;
+  border-radius: 6px;
+  padding: 4px 12px;
+
+  strong {
+    color: $primary-blue;
+    font-weight: 600;
+    margin-right: 4px;
+  }
 }
 
 // ---- Call & bell buttons ----
@@ -535,6 +588,17 @@ $transition:      0.18s ease;
   gap: 8px;
   flex-wrap: wrap;
   margin-bottom: 24px;
+  position: sticky;
+  top: 48px;                    /* offset below the sticky nav bar */
+  z-index: 100;
+  background: #ffffff;
+  padding: 16px 0 12px 0;
+  border-bottom: 1px solid $border-light;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+
+  @media (max-width: 640px) {
+    top: 0;
+  }
 }
 
 .tab {
@@ -542,24 +606,23 @@ $transition:      0.18s ease;
   font-family: inherit;
   font-size: 14px;
   font-weight: 500;
-  color: $primary-blue;
-  background: $surface-card;
-  border: 1.5px solid $border;
+  color: #ffffff !important;                   /* White on blue → 8.71:1 — AAA  */
+  background: $primary-blue !important;        /* Blue filled for non-selected   */
+  border: 1.5px solid $primary-blue !important;
   border-radius: 24px;
   padding: 7px 22px;
   cursor: pointer;
   transition: background $transition, color $transition, border-color $transition;
 
   &:hover:not(.tabActive) {
-    background: $surface;
-    border-color: $gold;
-    color: $gold-acc;
+    background: darken($primary-blue, 8%) !important;
+    border-color: darken($primary-blue, 8%) !important;
   }
 }
 
 .tabActive {
-  background: $gold;               /* Gold #D29F1C bg                       */
-  color: $dark-navy !important;    /* Dark Navy text → 6.06:1 on gold — AA  */
+  background: $gold !important;              /* Orange filled when selected            */
+  color: $dark-navy !important;              /* Dark Navy text → 6.06:1 on gold — AA  */
   border-color: $gold !important;
   font-weight: 600;
 }
@@ -591,6 +654,40 @@ $transition:      0.18s ease;
 
 .fullWidthSection {
   /* Contact Information spans full width */
+}
+
+// ============================================================
+// PERSISTENT CONTACT INFORMATION (always visible)
+// ============================================================
+.contactInfoDividerLine {
+  flex: 1;
+  border: none;
+  border-top: 1px solid $border-light;
+  margin: 0;
+}
+
+.persistentContactInfo {
+  margin-top: 28px;
+  background: $surface-card;
+  border: 1px solid $border-light;
+  border-top: 3px solid #{$text-secondary};
+  border-radius: $radius-card;
+  padding: 20px 24px;
+}
+
+.persistentContactInfoHeader {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.persistentContactInfoTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: $text-secondary;
+  margin: 0;
+  white-space: nowrap;
 }
 
 // ============================================================
@@ -628,6 +725,28 @@ $transition:      0.18s ease;
   font-weight: 700;
   color: $primary-blue; /* overridden inline per section */
   letter-spacing: -0.1px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.addressAlertBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: $red;
+  background: rgba(155, 44, 44, 0.08);
+  border: 1.5px solid rgba(155, 44, 44, 0.3);
+  border-radius: 4px;
+  padding: 2px 8px;
+  white-space: nowrap;
+
+  svg {
+    flex-shrink: 0;
+  }
 }
 
 .accordionChevron {
@@ -661,10 +780,71 @@ $transition:      0.18s ease;
 }
 
 // ============================================================
+// ADDRESS ALERT BANNER (above sections grid)
+// ============================================================
+.addressAlertBanner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(155, 44, 44, 0.07);
+  border: 1.5px solid rgba(155, 44, 44, 0.3);
+  border-left: 4px solid $red;
+  border-radius: 0 $radius-btn $radius-btn 0;
+  padding: 14px 20px;
+  margin-bottom: 20px;
+  font-size: 17px;
+  font-weight: 600;
+  color: $red;
+  line-height: 1.45;
+
+  svg {
+    flex-shrink: 0;
+    color: $red;
+  }
+
+  strong {
+    font-weight: 700;
+  }
+}
+
+// ============================================================
+// SPECIAL INSTRUCTIONS BANNER (top of booking section)
+// ============================================================
+.specialInstructionsBanner {
+  background: rgba(155, 44, 44, 0.06);
+  border-left: 3px solid $red;
+  border-radius: 0 $radius-btn $radius-btn 0;
+  padding: 10px 16px;
+  margin-bottom: 18px;
+}
+
+.specialInstructionsLabel {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: $red;
+  margin-bottom: 4px;
+}
+
+.specialInstructionsText {
+  font-size: 16px;
+  font-family: inherit;
+  color: $text-secondary;
+  margin: 0;
+  line-height: 1.55;
+
+  * {
+    font-size: inherit !important;
+    font-family: inherit !important;
+  }
+}
+
+// ============================================================
 // INSTRUCTION GROUPS
 // ============================================================
 .instructionGroup {
-  margin-bottom: 18px;
+  margin-bottom: 24px;
 
   &:last-child {
     margin-bottom: 0;
@@ -676,13 +856,138 @@ $transition:      0.18s ease;
   font-weight: 700;
   color: $primary-blue;
   margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-left: 3px solid $primary-blue;
+  padding-left: 8px;
+}
+
+// ---- Info icon + tooltip (Description field) ----
+.infoTooltipWrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+
+  &:hover .infoTooltip,
+  &:focus-within .infoTooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0) translateY(0);
+  }
+}
+
+.infoIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: $text-secondary;
+  cursor: help;
+  border-radius: 50%;
+  transition: color $transition;
+  flex-shrink: 0;
+
+  &:hover,
+  &:focus-visible {
+    color: $primary-blue;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $primary-blue;
+    outline-offset: 1px;
+  }
+
+  svg {
+    display: block;
+  }
+}
+
+.infoTooltip {
+  position: absolute;
+  left: calc(100% + 8px);
+  top: 50%;
+  transform: translateX(4px) translateY(-50%);
+  background: $dark-navy;
+  color: #fff;
+  font-size: 12.5px;
+  font-weight: 400;
+  line-height: 1.5;
+  padding: 8px 12px;
+  border-radius: 6px;
+  white-space: pre-line;
+  width: max-content;
+  max-width: 280px;
+  z-index: 10;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s ease, visibility 0.15s ease, transform 0.15s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+}
+
+// ---- Rich HTML content (Service Amendments rendered from SharePoint) ----
+.richContent {
+  color: $text-secondary;
+  font-size: 16px;
+  font-family: inherit;
+  line-height: 1.6;
+  padding-left: 22px;
+
+  // Strip inconsistent font-size/family injected by SharePoint's rich text editor
+  // Bold, italic, and color are preserved (font-weight, font-style, color are unaffected)
+  * {
+    font-size: inherit !important;
+    font-family: inherit !important;
+  }
+
+  ul, ol {
+    margin: 4px 0;
+    padding-left: 20px;
+  }
+
+  li {
+    margin-bottom: 3px;
+  }
+
+  b, strong {
+    font-weight: 700;
+    color: $dark-navy;
+  }
+
+  p {
+    margin: 4px 0;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 8px 0;
+    font-size: 16px;
+  }
+
+  th, td {
+    border: 1px solid #D1D5DB;
+    padding: 8px 10px;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  th {
+    background-color: #F3F4F6;
+    font-weight: 700;
+    color: $dark-navy;
+  }
+
+  tr:nth-child(even) {
+    background-color: #F9FAFB;
+  }
 }
 
 .instructionList {
   margin: 0;
-  padding-left: 20px;
+  padding-left: 38px;
   color: $text-secondary;
-  font-size: 13px;
+  font-size: 16px;
   line-height: 1.6;
 
   li {
@@ -695,7 +1000,7 @@ $transition:      0.18s ease;
   padding-left: 18px;
   list-style-type: circle;
   color: $text-secondary;
-  font-size: 12.5px;
+  font-size: 16px;
   line-height: 1.55;
 
   li {
@@ -710,6 +1015,13 @@ $transition:      0.18s ease;
   display: flex;
   flex-direction: column;
   gap: 14px;
+}
+
+.saEmptyState {
+  font-size: 16px;
+  color: $text-secondary;
+  font-style: italic;
+  margin: 0;
 }
 
 .saLabel {
@@ -750,51 +1062,157 @@ $transition:      0.18s ease;
 }
 
 // ============================================================
+// WAIT TIME BAR
+// ============================================================
+.waitTimeBar {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  background: rgba(31, 76, 127, 0.05);
+  border-left: 3px solid $primary-blue;
+  border-radius: 0 $radius-btn $radius-btn 0;
+  padding: 10px 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.waitTimeBarLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: $primary-blue;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-left: 12px;
+}
+
+// ---- Ok to Bill 3rd Party badge (beside wait time) ----
+.billThirdPartyBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 18px;
+  font-weight: 700;
+  color: $gold-acc;
+  background: rgba(138, 106, 12, 0.08);
+  border: 1.5px solid rgba(138, 106, 12, 0.3);
+  border-radius: 6px;
+  padding: 6px 14px;
+  white-space: nowrap;
+
+  strong {
+    font-weight: 700;
+  }
+
+  &.billYes {
+    color: #1a7a3a;
+    background: rgba(26, 122, 58, 0.08);
+    border-color: rgba(26, 122, 58, 0.25);
+  }
+
+  &.billNo {
+    color: #9B2C2C;
+    background: rgba(155, 44, 44, 0.08);
+    border-color: rgba(155, 44, 44, 0.25);
+  }
+}
+
+.waitTimeBarItems {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  font-size: 15px;
+  color: $text-secondary;
+
+  li {
+    &::before {
+      content: '•';
+      margin-right: 5px;
+      color: $primary-blue;
+    }
+  }
+}
+
+// ============================================================
 // CONTACT INFORMATION
 // ============================================================
 .contactInfoContent {
   display: flex;
   flex-direction: column;
-  gap: 18px;
 }
 
-.businessHoursLabel {
-  font-size: 14px;
-  color: $primary-blue;
-}
-
-.businessHoursValue {
-  font-size: 13.5px;
-  color: $text-secondary;
-  margin-top: -12px;
-}
-
-.contactInfoGrid {
+.supportGrid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
 
-  @media (max-width: 680px) {
+  @media (max-width: 960px) {
     grid-template-columns: 1fr;
   }
 }
 
-.contactInfoCard {
+.supportCard {
   border: 1px solid $border;
   border-radius: $radius-btn;
   padding: 18px;
   display: flex;
   flex-direction: column;
   gap: 14px;
+  transition: box-shadow $transition;
+
+  &:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
 }
 
-.contactInfoCardTitle {
+.supportCardHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.supportCardTopRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.supportCardIcon {
+  color: $primary-blue;
+  flex-shrink: 0;
+}
+
+.supportCardIconActive {
+  color: $gold-acc;
+}
+
+.supportCardIconMuted {
+  color: $text-secondary;
+}
+
+.supportCardTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: $dark-navy;
+  line-height: 1.3;
+}
+
+.supportCardSubtitle {
   font-size: 14px;
   font-weight: 700;
   color: $primary-blue;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
-.contactInfoCardTitleMuted {
+.supportCardSubtitleMuted {
   color: $text-secondary;
 }
 
@@ -804,14 +1222,81 @@ $transition:      0.18s ease;
   margin: 0;
 }
 
-.contactInfoSection {
+// ============================================================
+// APPROVAL TO MODIFY BADGES
+// ============================================================
+// ============================================================
+// TAB SELECTION PROMPT (no perspective chosen yet)
+// ============================================================
+.tabSelectionPrompt {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 40px 24px;
+  text-align: center;
+  color: $text-secondary;
+  background: $surface-card;
+  border: 1px dashed $border-light;
+  border-radius: $radius-card;
+
+  svg {
+    color: $primary-blue;
+    opacity: 0.5;
+  }
+
+  p {
+    font-size: 15px;
+    line-height: 1.6;
+    margin: 0;
+    max-width: 400px;
+
+    strong {
+      color: $primary-blue;
+      font-weight: 600;
+    }
+  }
 }
 
-.contactInfoSectionTitle {
-  font-size: 13px;
-  font-weight: 700;
-  color: $primary-blue;
+// ============================================================
+// APPROVAL TO MODIFY BADGES
+// ============================================================
+.approvalBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  border-radius: 4px;
+  padding: 1px 8px;
+  white-space: nowrap;
+  margin-left: 4px;
+  line-height: 1.4;
+  color: $text-secondary;
+  background: rgba(74, 85, 104, 0.08);
+  border: 1px solid rgba(74, 85, 104, 0.2);
+
+  svg {
+    flex-shrink: 0;
+  }
+}
+
+.approvalProceed {
+  color: #1a7a3a;
+  background: rgba(26, 122, 58, 0.08);
+  border-color: rgba(26, 122, 58, 0.25);
+}
+
+.approvalNeedsApproval {
+  color: $red;
+  background: rgba(155, 44, 44, 0.08);
+  border-color: rgba(155, 44, 44, 0.25);
+}
+
+.approvalProceedIf {
+  color: $gold-acc;
+  background: rgba(138, 106, 12, 0.08);
+  border-color: rgba(138, 106, 12, 0.25);
 }
