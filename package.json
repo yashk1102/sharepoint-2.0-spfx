@@ -21,6 +21,7 @@
     "@pnp/logging": "3.26.0",
     "@pnp/queryable": "3.26.0",
     "@pnp/sp": "3.26.0",
+    "dompurify": "3.3.2",
     "react": "17.0.1",
     "react-dom": "17.0.1"
   },

@@ -17,6 +17,14 @@
           "manifest": "./src/webparts/customerContactCards/CustomerContactCardsWebPart.manifest.json"
         }
       ]
+    },
+    "department-public-page-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/departmentPublicPage/DepartmentPublicPageWebPart.js",
+          "manifest": "./src/webparts/departmentPublicPage/DepartmentPublicPageWebPart.manifest.json"
+        }
+      ]
     }
   },
   "externals": {},
