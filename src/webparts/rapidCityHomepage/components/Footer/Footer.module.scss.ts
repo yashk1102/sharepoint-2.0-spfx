@@ -1,11 +1,11 @@
 /* tslint:disable */
 require("./Footer.module.css");
 const styles = {
-  footer: 'footer_d569c374',
-  copyright: 'copyright_d569c374',
-  sep: 'sep_d569c374',
-  feedback: 'feedback_d569c374',
-  updated: 'updated_d569c374'
+  footer: 'footer_3a9aeb81',
+  copyright: 'copyright_3a9aeb81',
+  sep: 'sep_3a9aeb81',
+  feedback: 'feedback_3a9aeb81',
+  updated: 'updated_3a9aeb81'
 };
 
 export default styles;

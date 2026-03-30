@@ -2,10 +2,10 @@ import * as React from 'react';
 import { Icon } from '@fluentui/react/lib/Icon';
 import styles from './DailyHighlight.module.scss';
 
-const bannerImage = require('../../assets/olympics-banner.jpg');
+const bannerImage = require('../../assets/testing-banner.png');
 
-const DEFAULT_HIGHLIGHT_TITLE = 'Daily Highlight: Olympic Spirit';
-const DEFAULT_HIGHLIGHT_SUBTITLE = 'Faster, Higher, Stronger \u2014 Together. Channel your inner champion today!';
+const DEFAULT_HIGHLIGHT_TITLE = 'Prepare to Launch: Welcome to Testing';
+const DEFAULT_HIGHLIGHT_SUBTITLE = 'RCT Intranet — Mission Ready. Your new hub is preparing for liftoff!';
 
 export interface IDailyHighlightProps {
   /** Optional title override */
@@ -26,14 +26,14 @@ export const DailyHighlight: React.FC<IDailyHighlightProps> = (props) => {
       <div
         className={styles.banner}
         role="img"
-        aria-label="Olympics themed banner with Olympic rings and snowy mountains"
+        aria-label="Space themed banner with Earth horizon and rocket trajectory"
         style={{ backgroundImage: `url(${bannerImage})` }}
       >
         <div className={styles.bannerOverlay} aria-hidden="true" />
         <div className={styles.card}>
           <div className={styles.headerRow}>
             <Icon
-              iconName="Trophy"
+              iconName="Rocket"
               className={styles.icon}
               aria-hidden="true"
             />
