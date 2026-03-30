@@ -13,6 +13,7 @@
     "SharePointFullPage"
   ],
   "supportsThemeVariants": true,
+  "supportsFullBleed": true,
   "preconfiguredEntries": [
     {
       "groupId": "5c03119e-3074-46fd-976b-c60198311f70",
@@ -28,7 +29,7 @@
       "officeFabricIconFontName": "Page",
       "properties": {
         "quickLinksJson": "",
-        "contactCardsPageUrl": "/sites/intranet/SitePages/ContactCards.aspx",
+        "contactCardsPageUrl": "https://rapidcitytransport.sharepoint.com/sites/ContactCards",
         "feedbackUrl": "#"
       }
     }

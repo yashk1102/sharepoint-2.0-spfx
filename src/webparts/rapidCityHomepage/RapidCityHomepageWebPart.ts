@@ -6,6 +6,7 @@ import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
 import { IQuickLink } from './models/IQuickLink';
 import RapidCityHomepage from './components/RapidCityHomepage';
 import { IRapidCityHomepageProps } from './components/IRapidCityHomepageProps';
+import { initializeSP } from '../customerContactCards/services/spConfig';
 
 export interface IRapidCityHomepageWebPartProps {
   /** JSON array of { label, url, iconName? } for quick links. */
@@ -27,10 +28,15 @@ const DEFAULT_QUICK_LINKS: IQuickLink[] = [
 ];
 
 export default class RapidCityHomepageWebPart extends BaseClientSideWebPart<IRapidCityHomepageWebPartProps> {
+  protected async onInit(): Promise<void> {
+    await super.onInit();
+    initializeSP(this.context);
+  }
+
   public render(): void {
     const element: React.ReactElement<IRapidCityHomepageProps> = React.createElement(RapidCityHomepage, {
       quickLinks: this._getQuickLinks(),
-      contactCardsPageUrl: this.properties.contactCardsPageUrl || '/sites/intranet/SitePages/ContactCards.aspx',
+      contactCardsPageUrl: this.properties.contactCardsPageUrl || 'https://rapidcitytransport.sharepoint.com/sites/ContactCards',
       feedbackUrl: this.properties.feedbackUrl || '#',
       displayMode: this.displayMode,
     });
