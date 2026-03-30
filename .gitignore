@@ -9,6 +9,7 @@ dist/
 lib/
 temp/
 release/
+sharepoint/
 
 # OS / editor
 .DS_Store
