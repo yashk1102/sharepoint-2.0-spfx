@@ -1,0 +1,32 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx/client-side-web-part-manifest.schema.json",
+  "id": "e7f8a9b0-c1d2-4e3f-a5b6-789012345678",
+  "alias": "DepartmentPublicPageWebPart",
+  "componentType": "WebPart",
+  "version": "1.0.0",
+  "manifestVersion": 2,
+  "requiresCustomScript": false,
+  "supportedHosts": [
+    "SharePointWebPart",
+    "SharePointFullPage"
+  ],
+  "supportsThemeVariants": true,
+  "supportsFullBleed": true,
+  "preconfiguredEntries": [
+    {
+      "groupId": "5c03119e-3074-46fd-976b-c60198311f70",
+      "group": { "default": "Advanced" },
+      "title": { "default": "Department Public Page" },
+      "description": { "default": "Public-facing department page for Rapid City Transportation" },
+      "officeFabricIconFontName": "Org",
+      "properties": {
+        "departmentKey": "customerExperience",
+        "allowedGroupId": "",
+        "resourcePageUrl": "",
+        "contactEmail": "",
+        "contactPhone": "",
+        "contactHours": ""
+      }
+    }
+  ]
+}
