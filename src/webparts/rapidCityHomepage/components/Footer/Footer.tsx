@@ -4,7 +4,6 @@ import styles from './Footer.module.scss';
 
 const COPYRIGHT = '\u00A9 2026 Rapid City Transportation - Internal Use Only';
 const FEEDBACK_LABEL = 'Send Feedback';
-const LAST_UPDATED = 'Last Updated: March 2026';
 
 export interface IFooterProps {
   /** Identifier for the current page context (shown in the feedback form) */
@@ -30,8 +29,6 @@ export const Footer: React.FC<IFooterProps> = ({ pageIdentifier }) => {
         >
           {FEEDBACK_LABEL}
         </button>
-        <span className={styles.sep} aria-hidden="true">|</span>
-        <span className={styles.updated}>{LAST_UPDATED}</span>
       </footer>
 
       {modalOpen && (
