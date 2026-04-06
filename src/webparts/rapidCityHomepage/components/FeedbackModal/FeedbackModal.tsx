@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { Icon } from '@fluentui/react/lib/Icon';
-// TODO: Wire up real submission once SharePoint list is ready
-// import { submitFeedback } from '../../services/FeedbackService';
+import { submitFeedback } from '../../services/FeedbackService';
 import styles from './FeedbackModal.module.scss';
 
 /* ── Urgency choices ─────────────────────────────────────────────────────────── */
@@ -96,11 +95,17 @@ export const FeedbackModal: React.FC<IFeedbackModalProps> = ({
         return;
       }
 
-      // TODO: Replace with real submission once SharePoint list is ready
-      // await submitFeedback({ pageIdentifier, description: description.trim(), urgency });
-      setSubmitError(
-        'Submission is not implemented yet.'
-      );
+      setSubmitting(true);
+      try {
+        await submitFeedback({ pageIdentifier, description: description.trim(), urgency });
+        setView('success');
+      } catch (err) {
+        setSubmitError(
+          'Something went wrong submitting your feedback. Please try again.'
+        );
+      } finally {
+        setSubmitting(false);
+      }
     },
     [description, urgency, pageIdentifier]
   );
