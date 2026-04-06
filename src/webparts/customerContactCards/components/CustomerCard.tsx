@@ -12,9 +12,8 @@ const TYPE_ACCENT: Record<CustomerType, string> = {
   'Treatment Clinic':  '#3A8FB7',
   'Hospital':          '#2E7D32',
   'School':            '#8A6A0C',
-  'Social Services':   '#B84A00',
+  'Social/Community Services': '#B84A00',
   'Lawyer':            '#4A5568',
-  'Insurance Company': '#9B2C2C',
   'WSIB': '#952c9b',
   'Other': '#4A5568'
 };

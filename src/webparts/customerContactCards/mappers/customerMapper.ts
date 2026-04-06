@@ -32,7 +32,10 @@ const LOOKUP_TO_SECTION: Record<string, SectionKey> = {
  * If the role contains both "Referral" and "Customer" (e.g. "Referral & Customer"),
  * the Customer tab is hidden — its blocks are merged into Referral.
  */
-function parseVisibleTabs(role?: string): TabId[] {
+function parseVisibleTabs(role?: string, customerType?: CustomerType): TabId[] {
+  // WSIB customers only use the Passenger tab
+  if (customerType === 'WSIB') return ['passenger'];
+
   if (!role) return ['referral', 'passenger', 'customer'];
 
   const lower = role.toLowerCase();
@@ -91,7 +94,7 @@ export function mapGridItemsToCustomers(items: IProtocolBookGridItem[]): ICustom
       referral: emptyTabContent(),
       passenger: emptyTabContent(),
       customer: emptyTabContent(),
-      visibleTabs: parseVisibleTabs(item.ClientRole),
+      visibleTabs: parseVisibleTabs(item.ClientRole, mapCustomerType(item.ClientType)),
       clientRole: item.ClientRole || undefined,
     };
   });
@@ -104,7 +107,7 @@ export function mapDetailItemToCustomer(item: IProtocolBookDetailItem): ICustome
   const orgName = item.ClientName || item.Title || '';
 
   const blocksByTab = collectBlocksByTab(item);
-  const visibleTabs = parseVisibleTabs(item.ClientRole);
+  const visibleTabs = parseVisibleTabs(item.ClientRole, mapCustomerType(item.ClientType));
 
   let referralBlocks = blocksByTab.Client || {};
   let passengerBlocks = blocksByTab.Passenger || {};
@@ -146,11 +149,18 @@ export function mapDetailItemToCustomer(item: IProtocolBookDetailItem): ICustome
     passengerName: cleanField(item.PassengerName),
     specialInstructions: rawField(item.SpecialInstructions),
     okToBill3rdParty: item.OkToBill3rdParty || undefined,
+    passengerOkToBook: item.PassengerOkToBook === true,
     passengerNotes: rawField(item.PassengerNotes),
     unitInfo: rawField(item.UnitInfo),
     tripNotes: rawField(item.TripNotes),
     referralOptions: rawField(item.ReferralOptions),
     confirmationsSpecific: rawField(item.ConfirmationsSpecific),
+    businessHoursValue: cleanField(item.BusinessHours),
+
+    approvalBlanket: rawField(item.ApprovalBlanket),
+    approvalAllModifications: rawField(item.ApprovalAllModifications),
+    approvalRTW: rawField(item.ApprovalRTW),
+    approvalNotes: rawField(item.ApprovalNotes),
   };
 }
 
@@ -446,7 +456,7 @@ function extractEmail(text?: string): string {
 function mapCustomerType(raw?: string): CustomerType {
   const known: CustomerType[] = [
     'IME Clinic', 'Treatment Clinic', 'Hospital', 'School',
-    'Social Services', 'Lawyer', 'Insurance Company', 'WSIB'
+    'Social/Community Services', 'Lawyer', 'WSIB'
   ];
 
   if (raw && known.indexOf(raw as CustomerType) !== -1) {

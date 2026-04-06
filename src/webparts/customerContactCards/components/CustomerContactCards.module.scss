@@ -514,6 +514,12 @@ $transition:      0.18s ease;
   line-height: 1.55;
 }
 
+.detailBioBold {
+  font-weight: 700;
+  color: $dark-navy;
+  white-space: pre-line;
+}
+
 // ---- Detail header metadata chips (Customer, Account #, Passenger) ----
 .detailMeta {
   display: flex;
@@ -771,7 +777,7 @@ $transition:      0.18s ease;
 }
 
 .accordionBodyOpen {
-  max-height: 2400px;
+  max-height: 5000px;
 }
 
 .accordionBodyInner {
@@ -861,6 +867,21 @@ $transition:      0.18s ease;
   gap: 6px;
   border-left: 3px solid $primary-blue;
   padding-left: 8px;
+}
+
+.approvalSubField {
+  margin-bottom: 10px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.approvalSubLabel {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: $text-secondary;
+  margin-bottom: 2px;
 }
 
 // ---- Info icon + tooltip (Description field) ----
@@ -1299,4 +1320,83 @@ $transition:      0.18s ease;
   color: $gold-acc;
   background: rgba(138, 106, 12, 0.08);
   border-color: rgba(138, 106, 12, 0.25);
+}
+
+// ============================================================
+// PASSENGER NOT OK TO BOOK BANNER
+// ============================================================
+.passengerNotOkBanner {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: $red;
+  background: rgba(155, 44, 44, 0.08);
+  border: 1.5px solid rgba(155, 44, 44, 0.3);
+  border-radius: 4px;
+  padding: 2px 8px;
+  white-space: nowrap;
+
+  svg {
+    flex-shrink: 0;
+  }
+}
+
+// ============================================================
+// BOOKING SECTION MUTED (Passenger tab)
+// ============================================================
+.bookingMuted {
+  opacity: 0.45;
+  pointer-events: none;
+  position: relative;
+  filter: grayscale(40%);
+  transition: opacity $transition, filter $transition;
+}
+
+.bookingMutedNote {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: $text-secondary;
+  background: $surface;
+  border: 1px solid $border-light;
+  border-radius: 6px;
+  padding: 6px 12px;
+  margin-bottom: 8px;
+
+  svg {
+    flex-shrink: 0;
+    color: $text-secondary;
+  }
+}
+
+// ============================================================
+// BUSINESS HOURS BANNER (below contact info)
+// ============================================================
+.businessHoursBanner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(31, 76, 127, 0.05);
+  border: 1px solid rgba(31, 76, 127, 0.15);
+  border-radius: $radius-btn;
+  padding: 12px 18px;
+  margin-bottom: 14px;
+  font-size: 14px;
+  color: $text-secondary;
+  line-height: 1.5;
+
+  svg {
+    flex-shrink: 0;
+    color: $primary-blue;
+  }
+
+  strong {
+    font-weight: 700;
+    color: $primary-blue;
+  }
 }

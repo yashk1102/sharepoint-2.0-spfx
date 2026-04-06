@@ -8,6 +8,7 @@ export const PB = {
   ClientRole: 'Client_x0020_Role',
   ClientType: 'ClientType',
   Specification: 'Specification',
+  BusinessHours: 'BusinessHours',
 
   PhoneBusinessHours: 'Phone_x0020_Numbers_x0020__x00280',
   PhoneAfterHours: 'Phone_x0020_Numbers_x0020__x0028',
@@ -21,6 +22,7 @@ export const PB = {
   ConfirmationsSpecific: 'Confirmations1',
 
   PassengerNotes: 'PassengerNotes',
+  PassengerOkToBook: 'PassengerOKtoBook',
   TripNotes: 'Trip_x0020_Notes',
   UnitInfo: 'Unit_x0020_Info',
   ProblemWithReminderCall: 'Problem_x0020_With_x0020_Reminde',

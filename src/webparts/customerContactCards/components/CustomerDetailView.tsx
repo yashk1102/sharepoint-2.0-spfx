@@ -28,9 +28,8 @@ const TYPE_ACCENT: Record<CustomerType, string> = {
   'Treatment Clinic':  '#3A8FB7',
   'Hospital':          '#2E7D32',
   'School':            '#8A6A0C',
-  'Social Services':   '#B84A00',
+  'Social/Community Services': '#B84A00',
   'Lawyer':            '#4A5568',
-  'Insurance Company': '#9B2C2C',
   'WSIB': '#952c9b',
   'Other': '#4A5568'
 };
@@ -401,7 +400,12 @@ const CustomerDetailView: React.FC<ICustomerDetailViewProps> = ({ customer, onBa
               </span>
             )}
           </h1>
-          <p className={styles.detailBio}>{customer.bio}</p>
+          {customer.bio && (
+            <div
+              className={`${styles.detailBio} ${styles.detailBioBold}`}
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(customer.bio) }}
+            />
+          )}
         </div>
 
       </header>
@@ -437,7 +441,13 @@ const CustomerDetailView: React.FC<ICustomerDetailViewProps> = ({ customer, onBa
             <polyline points="10 17 15 12 10 7"/>
             <line x1="15" y1="12" x2="3" y2="12"/>
           </svg>
-          <p>Select <strong>Referral</strong>, <strong>Passenger</strong>, or <strong>Customer</strong> above to view instructions.</p>
+          <p>Select {tabs.map((t, i) => (
+            <React.Fragment key={t.id}>
+              {i > 0 && i < tabs.length - 1 && ', '}
+              {i > 0 && i === tabs.length - 1 && (tabs.length > 2 ? ', or ' : ' or ')}
+              <strong>{t.label}</strong>
+            </React.Fragment>
+          ))} above to view instructions.</p>
         </div>
       ) : (
         <div
@@ -481,12 +491,19 @@ const CustomerDetailView: React.FC<ICustomerDetailViewProps> = ({ customer, onBa
           )}
 
           <div className={styles.sectionsGrid}>
+            <div className={activeTab === 'passenger' && !customer.passengerOkToBook ? styles.bookingMuted : undefined}>
             <AccordionSection
               id={`${prefix}-booking`}
               title="Booking"
               accentColor={SECTION_COLORS.booking}
               isOpen={row1Open}
               onToggle={toggleRow1}
+              badge={activeTab === 'passenger' && !customer.passengerOkToBook ? (
+                <span className={styles.passengerNotOkBanner}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                  Passenger NOT OK TO BOOK
+                </span>
+              ) : undefined}
             >
               {customer.specialInstructions && (
                 <div className={styles.specialInstructionsBanner}>
@@ -513,7 +530,25 @@ const CustomerDetailView: React.FC<ICustomerDetailViewProps> = ({ customer, onBa
                 appendHtml={customer.confirmationsSpecific}
               />
               <InstructionGroupList groups={bookingGroupsByCategory.other} />
+              {(customer.approvalBlanket || customer.approvalAllModifications || customer.approvalRTW || customer.approvalNotes) && (
+                <div className={styles.instructionGroup}>
+                  <div className={styles.instructionGroupTitle}>Approvals</div>
+                  {customer.approvalBlanket && (
+                    <div className={styles.richContent} dangerouslySetInnerHTML={{ __html: sanitizeHtml(customer.approvalBlanket) }} />
+                  )}
+                  {customer.approvalAllModifications && (
+                    <div className={styles.richContent} dangerouslySetInnerHTML={{ __html: sanitizeHtml(customer.approvalAllModifications) }} />
+                  )}
+                  {customer.approvalRTW && (
+                    <div className={styles.richContent} dangerouslySetInnerHTML={{ __html: sanitizeHtml(customer.approvalRTW) }} />
+                  )}
+                  {customer.approvalNotes && (
+                    <div className={styles.richContent} dangerouslySetInnerHTML={{ __html: sanitizeHtml(customer.approvalNotes) }} />
+                  )}
+                </div>
+              )}
             </AccordionSection>
+            </div>
 
             <AccordionSection
               id={`${prefix}-amendments`}
@@ -579,6 +614,13 @@ const CustomerDetailView: React.FC<ICustomerDetailViewProps> = ({ customer, onBa
             </h2>
             <hr className={styles.contactInfoDividerLine} />
           </div>
+
+          {customer.businessHoursValue && (
+            <div className={styles.businessHoursBanner}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <span><strong>Business Hours:</strong> {customer.businessHoursValue}</span>
+            </div>
+          )}
 
           <ContactInformationContent
             tabContent={contactTabContent}

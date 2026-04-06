@@ -19,6 +19,7 @@ export interface IProtocolBookGridItem {
 }
 
 export interface IProtocolBookDetailItem extends IProtocolBookGridItem {
+  BusinessHours?: string;
   PhoneAfterHours?: string;
   SpecialInstructions?: string;
   AccountNumber?: string;
@@ -30,6 +31,7 @@ export interface IProtocolBookDetailItem extends IProtocolBookGridItem {
   UnitInfo?: string;
   ProblemWithReminderCall?: string;
   OkToBill3rdParty?: string;
+  PassengerOkToBook?: boolean;
   ConfirmationsSpecific?: string;
 
   ApprovalAllModifications?: string;

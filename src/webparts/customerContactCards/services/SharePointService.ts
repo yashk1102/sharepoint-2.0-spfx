@@ -78,11 +78,11 @@ export async function fetchDetailItem(
 
   const flatFields = [
     PB.Id, PB.Title, PB.ClientName, PB.ClientRole, PB.ClientType,
-    PB.Specification, PB.PhoneBusinessHours, PB.PhoneAfterHours,
+    PB.Specification, PB.BusinessHours, PB.PhoneBusinessHours, PB.PhoneAfterHours,
     PB.SpecialInstructions, PB.AccountNumber, PB.Customer,
     PB.ReferralOptions, PB.PassengerName, PB.PassengerNotes, PB.TripNotes,
     PB.UnitInfo, PB.ProblemWithReminderCall,
-    PB.OkToBill3rdParty, PB.ConfirmationsSpecific,
+    PB.OkToBill3rdParty, PB.PassengerOkToBook, PB.ConfirmationsSpecific,
     PB.ApprovalAllModifications, PB.ApprovalBlanket,
     PB.ApprovalRTW, PB.ApprovalNotes,
   ];
@@ -184,6 +184,7 @@ function mapRawToDetail(
     ClientRole: (raw[PB.ClientRole] as string) || undefined,
     ClientType: (raw[PB.ClientType] as string) || undefined,
     Specification: (raw[PB.Specification] as string) || undefined,
+    BusinessHours: (raw[PB.BusinessHours] as string) || undefined,
     PhoneBusinessHours: (raw[PB.PhoneBusinessHours] as string) || undefined,
     PhoneAfterHours: (raw[PB.PhoneAfterHours] as string) || undefined,
     SpecialInstructions: (raw[PB.SpecialInstructions] as string) || undefined,
@@ -196,6 +197,7 @@ function mapRawToDetail(
     UnitInfo: (raw[PB.UnitInfo] as string) || undefined,
     ProblemWithReminderCall: (raw[PB.ProblemWithReminderCall] as string) || undefined,
     OkToBill3rdParty: mapBoolOrString(raw[PB.OkToBill3rdParty]),
+    PassengerOkToBook: raw[PB.PassengerOkToBook] === true,
     ConfirmationsSpecific: (raw[PB.ConfirmationsSpecific] as string) || undefined,
     ApprovalAllModifications: (raw[PB.ApprovalAllModifications] as string) || undefined,
     ApprovalBlanket: (raw[PB.ApprovalBlanket] as string) || undefined,

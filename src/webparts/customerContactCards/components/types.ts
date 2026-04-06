@@ -3,9 +3,8 @@ export type CustomerType =
   | 'Treatment Clinic'
   | 'Hospital'
   | 'School'
-  | 'Social Services'
+  | 'Social/Community Services'
   | 'Lawyer'
-  | 'Insurance Company'
   | 'WSIB'
   | 'Other';
 
@@ -14,9 +13,8 @@ export const CUSTOMER_TYPES: CustomerType[] = [
   'Treatment Clinic',
   'Hospital',
   'School',
-  'Social Services',
+  'Social/Community Services',
   'Lawyer',
-  'Insurance Company',
   'WSIB',
   'Other',
 ];
@@ -78,9 +76,18 @@ export interface ICustomer {
   passengerName?: string;
   specialInstructions?: string;
   okToBill3rdParty?: string;
+  passengerOkToBook?: boolean;
   passengerNotes?: string;
   unitInfo?: string;
   tripNotes?: string;
   referralOptions?: string;
   confirmationsSpecific?: string;
+  /** Business Hours value from SharePoint — displayed as a banner below contact info. */
+  businessHoursValue?: string;
+
+  // Approval fields (flat — same value regardless of active tab)
+  approvalBlanket?: string;
+  approvalAllModifications?: string;
+  approvalRTW?: string;
+  approvalNotes?: string;
 }
