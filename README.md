@@ -81,7 +81,7 @@ Output: `sharepoint/solution/rapid-city-transportation-hub.sppkg`. Upload to you
 | `src/webparts/rapidCityHomepage/components/Hero/` | Welcome title + subtitle |
 | `src/webparts/rapidCityHomepage/components/DailyHighlight/` | Olympics-style highlight card + InfoTooltipIcon example |
 | `src/webparts/rapidCityHomepage/components/QuickLinks/` | Config-driven quick link tiles |
-| `src/webparts/rapidCityHomepage/components/Footer/` | Copyright, Send Feedback, Last Updated |
+| `src/webparts/rapidCityHomepage/components/Footer/` | Copyright, Send Feedback |
 | `src/webparts/rapidCityHomepage/components/InfoTooltipIcon/` | Reusable info tooltip (Fluent Tooltip + Info icon) |
 | `src/webparts/rapidCityHomepage/theme/ThemeTokens.ts` | Theme token types and defaults |
 | `src/webparts/rapidCityHomepage/theme/themeVariables.scss` | CSS custom properties (--rct-*) |
