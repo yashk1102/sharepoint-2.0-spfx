@@ -1,87 +1,86 @@
-# Rapid City Transportation Hub – SPFx Landing Page
+# SharePoint 2.0 – Rapid City Transportation Hub
 
-Production-ready SharePoint Framework (SPFx) React web part for the **Rapid City Transportation Hub** intranet homepage.
+This project is the new internal SharePoint hub I’ve been building for Rapid City Transportation.
 
-## Requirements
+The goal of this app is to make internal information easier to access, easier to maintain, and easier for employees to actually use day to day. A lot of the work has been focused on creating a cleaner and more structured intranet experience instead of having information scattered around in different places or buried in old pages.
 
-- **Node.js**: Use **v18.x** (e.g. 18.17.1 or later within 18) for `gulp build`.  
-  SPFx 1.18 does not support Node 20. Use [nvm-windows](https://github.com/coreybutler/nvm-windows) or similar to switch: `nvm use 18`
-- **npm**: 6.x or later
-- **SharePoint**: Modern site (SharePoint Online or supported on-prem)
+At a high level, this project includes a new home page, department pages, and a customer contact cards experience that helps staff quickly find the right operational information they need.
 
-## Quick Start
+## What this project includes
 
-```bash
-npm install
-npx gulp build
-```
+### Home page
+The home page acts as the main landing page for employees. It is meant to give staff one place to start from when they open the intranet.
 
-To serve locally (workbench):
+It includes things like:
 
-```bash
-npx gulp serve
-```
+- main navigation
+- featured or highlighted content
+- access to important internal resources
+- links to department pages
+- a cleaner overall structure for the internal hub
 
-## What’s Included
+The idea behind the home page was to create something that feels more modern and organized while still being practical for employees who just need to get to the right place quickly.
 
-- **Web part**: `RapidCityHomepageWebPart` – full-page layout (header, nav, hero, daily highlight, quick links, footer).
-- **Theme**: `src/webparts/rapidCityHomepage/theme/ThemeTokens.ts` and `themeVariables.scss` – tokens for primary/secondary, background, surface, text, borders, accents; 8px spacing grid.
-- **Configurable**:
-  - **Quick links**: Property pane “Quick Links (JSON)” – array of `{ "label": "...", "url": "...", "iconName": "..." }`. Default set: Employee Directory, Contact Cards, ADP, Teams, Outlook, Five9, RISE Hub.
-  - **Contact Cards page URL**: Used when user submits search – redirect to Contact Cards with `?q=...`.
-  - **Feedback URL**: “Send Feedback” link in footer.
-- **Search**: Search bar submits to Contact Cards page via `window.location.assign` with query string `q=...`. Update `contactCardsPageUrl` in the property pane to your real page (e.g. `/sites/intranet/SitePages/ContactCards.aspx`).
-- **Navigation**: “Department Hubs” and “Employee Support” are dropdowns; update `DEPARTMENT_HUBS_OPTIONS` and `EMPLOYEE_SUPPORT_OPTIONS` in `Navigation.tsx` with real intranet links.
-- **Accessibility**: Skip-to-content link, semantic HTML (`header`, `nav`, `main`, `footer`), ARIA labels on icon buttons, focus outlines, high contrast (dark text on light). Aimed at WCAG AA.
-- **Reusable component**: `<InfoTooltipIcon text="..." />` – Fluent Tooltip + Info icon; used in Daily Highlight and reusable in Contact Cards.
+### Customer Contact Cards
+The Customer Contact Cards page is one of the main functional parts of this project.
 
-## Where to Update URLs
+This page was built to help employees quickly look up operational instructions and contact-related details tied to specific customers, referrals, and passengers. Instead of digging through the protocol book, staff can open a contact card and view the information they need in a more structured format.
 
-- **Contact Cards (search target)**  
-  Web part property pane → “Contact Cards page URL (for search redirect)”  
-  Or default in `RapidCityHomepageWebPart.ts`: `contactCardsPageUrl`
+This part of the project includes work around:
 
-- **Feedback link**  
-  Web part property pane → “Send Feedback link URL”  
-  Or default in `RapidCityHomepageWebPart.ts`: `feedbackUrl`
+- organizing contact-related information into cards
+- separating information by referral, passenger, and customer
+- showing important sections like booking instructions, service amendments, cancellations/changes, and reminder call details
+- improving readability and layout so the information is easier to scan
+- making the experience more user-friendly by controlling when sections appear, collapse, or expand
+- supporting visual indicators for things like approval requirements or booking restrictions
 
-- **Nav dropdown links**  
-  `src/webparts/rapidCityHomepage/components/Navigation/Navigation.tsx`:  
-  - `DEPARTMENT_HUBS_OPTIONS`  
-  - `EMPLOYEE_SUPPORT_OPTIONS`  
-  - “Training Hub” and “Home” `href` values
+A big part of this work has been making sure the contact cards are not just technically functional, but actually easier for employees to use in real workflows.
 
-- **Quick links**  
-  Either configure in the property pane (JSON) or change `DEFAULT_QUICK_LINKS` in `RapidCityHomepageWebPart.ts`.
+### Department pages
+The department pages are meant to give each department its own space within the hub.
 
-## Package & Deploy
+These pages help organize department-specific content while keeping the overall experience consistent with the rest of the intranet. Instead of putting everything onto one page, the department pages create a cleaner structure where employees can go to the area most relevant to them.
 
-```bash
-npx gulp bundle --ship
-npx gulp package-solution --ship
-```
+This also helps the hub scale better over time as more content and internal resources get added.
 
-Output: `sharepoint/solution/rapid-city-transportation-hub.sppkg`. Upload to your app catalog and deploy.
+## Why I built it
 
-## Tech Stack
+The main reason for building this was to improve the internal employee experience.
 
-- SPFx 1.18.2, React 17, TypeScript 4.7
-- Fluent UI React 8 (`@fluentui/react`) – SearchBox, Icon, IconButton, Dropdown, TooltipHost
-- CSS Modules (`.module.scss`) for all styles; no global CSS
-- Theme tokens in TypeScript + SCSS variables for consistency and WCAG contrast
+A lot of internal systems can become hard to navigate over time, especially when information grows quickly and different teams need different things. This project was meant to move toward a better SharePoint experience that feels more intentional, more organized, and easier to maintain.
 
-## File Summary
+I wanted to build something that:
 
-| Path | Purpose |
-|------|--------|
-| `src/webparts/rapidCityHomepage/RapidCityHomepageWebPart.ts` | Web part entry, property pane, quick links parsing |
-| `src/webparts/rapidCityHomepage/components/RapidCityHomepage.tsx` | Main layout, search handler, skip link, theme vars |
-| `src/webparts/rapidCityHomepage/components/Header/` | Branding, search bar, utility icons |
-| `src/webparts/rapidCityHomepage/components/Navigation/` | Nav row + Department Hubs / Employee Support dropdowns |
-| `src/webparts/rapidCityHomepage/components/Hero/` | Welcome title + subtitle |
-| `src/webparts/rapidCityHomepage/components/DailyHighlight/` | Olympics-style highlight card + InfoTooltipIcon example |
-| `src/webparts/rapidCityHomepage/components/QuickLinks/` | Config-driven quick link tiles |
-| `src/webparts/rapidCityHomepage/components/Footer/` | Copyright, Send Feedback |
-| `src/webparts/rapidCityHomepage/components/InfoTooltipIcon/` | Reusable info tooltip (Fluent Tooltip + Info icon) |
-| `src/webparts/rapidCityHomepage/theme/ThemeTokens.ts` | Theme token types and defaults |
-| `src/webparts/rapidCityHomepage/theme/themeVariables.scss` | CSS custom properties (--rct-*) |
+- gives employees a clearer starting point
+- makes important information easier to find
+- improves the structure of operational content
+- creates a better experience for navigating between pages and departments
+- supports future growth without everything feeling messy
+
+## Main focus areas
+
+While working on this project, a lot of my focus went into:
+
+- improving navigation and overall layout
+- making the intranet feel more modern and structured
+- creating a better way to display customer and operational information
+- building reusable components that can be used across pages
+- making the UI clearer and easier to scan
+- keeping accessibility and usability in mind
+
+## Tech stack
+
+This project was built using:
+
+- SharePoint Framework (SPFx)
+- React
+- TypeScript
+- Fluent UI
+- SCSS / CSS Modules
+
+## Notes
+
+This is an internal business application, so a lot of the structure and content is tailored to Rapid City Transportation’s internal workflows.
+
+The project is still part of a broader effort to improve the company intranet and make internal tools more useful for the people who rely on them every day.
